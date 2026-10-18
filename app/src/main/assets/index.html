@@ -127,6 +127,8 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .sndrow{display:flex;gap:8px;justify-content:flex-end;margin-bottom:-8px}
 .sndrow button{font:600 .85rem var(--body);padding:6px 10px;border-radius:999px;border:2px solid var(--edge);background:var(--card)}
 .sndrow button[aria-pressed="false"]{opacity:.55}
+#updBtn[hidden]{display:none}
+#updBtn{display:block;width:100%;font:700 1rem var(--body);padding:12px;border-radius:14px;border:2px solid var(--edge);background:var(--pencil);color:var(--pencil-ink)}
 @media (prefers-reduced-motion:reduce){.bubble,.bubble .em,.streak,.prob-ok{animation-duration:.01s}#confetti{display:none}}
 /* learn */
 .lgroup{margin:0 0 16px}
@@ -169,6 +171,7 @@ mark.b{background:rgba(242,183,5,.28);background:color-mix(in srgb,var(--pencil)
 <div id="cheer" aria-live="polite"></div>
 
 <div class="wrap" id="home">
+  <button id="updBtn" hidden>🔄 New app update! Tap to install</button>
   <div class="sndrow"><button id="sndBtn" aria-pressed="true">🔊 Sounds</button><button id="voiceBtn" aria-pressed="true">🗣️ Voice</button></div>
   <div>
     <h1>Ivana's <span>Reading Coach</span></h1>
@@ -874,6 +877,10 @@ function renderSnd(){$("sndBtn").setAttribute("aria-pressed",st.snd);$("sndBtn")
 $("sndBtn").onclick=()=>{st.snd=!st.snd;save();renderSnd();if(st.snd)SOUNDS.right()};
 $("voiceBtn").onclick=()=>{st.voice=!st.voice;save();renderSnd();if(st.voice)say("Hi sweetie! Let's practice together!")};
 renderSnd();
+// App v1.4+: the app checks GitHub for a newer version of itself and we show an Update button
+window.onAppUpdate=()=>{$("updBtn").hidden=false};
+$("updBtn").onclick=()=>{try{AndroidApp.install()}catch(e){}};
+try{if(window.AndroidApp&&AndroidApp.check)AndroidApp.check()}catch(e){}
 
 // ---------- session ----------
 let S=null; // {kind,track,lvl,counts,name,items:[q],i,right,wrong:[],hl,test}

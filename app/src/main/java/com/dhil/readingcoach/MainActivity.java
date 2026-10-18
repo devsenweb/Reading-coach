@@ -1,10 +1,17 @@
 package com.dhil.readingcoach;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageInstaller;
+import android.net.Uri;
+import android.os.Build;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 import android.view.WindowManager;
@@ -19,11 +26,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Shows the Reading Coach page. On every launch it quietly downloads the newest
@@ -60,6 +70,7 @@ public class MainActivity extends Activity {
             }
         });
         web.addJavascriptInterface(new Speaker(), "AndroidVoice");
+        web.addJavascriptInterface(new Updater(), "AndroidApp");
         current = loadPage();
         show(current);
     }
@@ -114,6 +125,134 @@ public class MainActivity extends Activity {
             }
             return false;
         }
+    }
+
+    // In-app update of the app itself: the page shows an Update button when build.gradle on main
+    // has a newer versionCode; tapping it downloads the APK and opens Android's install screen.
+    private static final String GRADLE_URL = "https://raw.githubusercontent.com/devsenweb/reading-coach/main/app/build.gradle";
+    private static final String APK_URL = "https://github.com/devsenweb/reading-coach/releases/download/latest/ReadingCoach.apk";
+    private static final String INSTALL_ACTION = "com.dhil.readingcoach.INSTALL_STATUS";
+    private volatile boolean installing;
+
+    private class Updater {
+        @JavascriptInterface
+        public int version() { return BuildConfig.VERSION_CODE; }
+
+        /** Calls window.onAppUpdate(newVersion) in the page when a newer app is on main. */
+        @JavascriptInterface
+        public void check() {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        HttpURLConnection c = (HttpURLConnection) new URL(GRADLE_URL + "?t=" + System.currentTimeMillis()).openConnection();
+                        c.setConnectTimeout(8000);
+                        c.setReadTimeout(8000);
+                        c.setUseCaches(false);
+                        if (c.getResponseCode() != 200) return;
+                        Matcher m = Pattern.compile("versionCode\\s+(\\d+)").matcher(read(c.getInputStream()));
+                        if (!m.find()) return;
+                        final int latest = Integer.parseInt(m.group(1));
+                        if (latest <= BuildConfig.VERSION_CODE) return;
+                        main.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                web.evaluateJavascript("window.onAppUpdate&&onAppUpdate(" + latest + ")", null);
+                            }
+                        });
+                    } catch (Exception ignored) {
+                        // offline: try again next launch
+                    }
+                }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public void install() {
+            if (installing) return;
+            if (Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
+                main.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast("Turn on \"Allow from this source\", then come back and tap Update again");
+                        startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName())));
+                    }
+                });
+                return;
+            }
+            installing = true;
+            toast("Downloading the update…");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        installApk();
+                    } catch (Exception e) {
+                        toast("Update failed. Check the internet and try again.");
+                    } finally {
+                        installing = false;
+                    }
+                }
+            }).start();
+        }
+    }
+
+    private void installApk() throws Exception {
+        File apk = new File(getCacheDir(), "update.apk");
+        HttpURLConnection c = (HttpURLConnection) new URL(APK_URL + "?t=" + System.currentTimeMillis()).openConnection();
+        c.setConnectTimeout(15000);
+        c.setReadTimeout(30000);
+        c.setInstanceFollowRedirects(true);
+        if (c.getResponseCode() != 200) throw new Exception("HTTP " + c.getResponseCode());
+        try (InputStream in = c.getInputStream(); FileOutputStream out = new FileOutputStream(apk)) {
+            byte[] buf = new byte[65536];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+        }
+        // build.gradle can be ahead of the release for a minute while GitHub builds it
+        PackageInfo info = getPackageManager().getPackageArchiveInfo(apk.getPath(), 0);
+        if (info == null) throw new Exception("bad apk");
+        if (info.versionCode <= BuildConfig.VERSION_CODE) {
+            toast("The update is still being built. Try again in a minute.");
+            return;
+        }
+        PackageInstaller pi = getPackageManager().getPackageInstaller();
+        PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+        params.setAppPackageName(getPackageName());
+        int id = pi.createSession(params);
+        try (PackageInstaller.Session session = pi.openSession(id)) {
+            try (InputStream in = new FileInputStream(apk); OutputStream out = session.openWrite("ReadingCoach.apk", 0, apk.length())) {
+                byte[] buf = new byte[65536];
+                int n;
+                while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                session.fsync(out);
+            }
+            Intent i = new Intent(this, MainActivity.class).setAction(INSTALL_ACTION);
+            int flags = PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 31 ? PendingIntent.FLAG_MUTABLE : 0);
+            session.commit(PendingIntent.getActivity(this, 0, i, flags).getIntentSender());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent == null || !INSTALL_ACTION.equals(intent.getAction()) || intent.getExtras() == null) return;
+        int status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
+        if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+            Intent confirm = (Intent) intent.getExtras().get(Intent.EXTRA_INTENT);
+            if (confirm != null) startActivity(confirm);
+        } else if (status != PackageInstaller.STATUS_SUCCESS) {
+            toast("Update didn't install. Try again.");
+        }
+    }
+
+    private void toast(final String msg) {
+        main.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
