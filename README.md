@@ -32,9 +32,9 @@ Everything lives in `app/src/main/assets/index.html` (`GRAMMAR`, `STORIES`, `TIP
 the script). Once it is on `main`, the app downloads it on next launch. No reinstall.
 
 ## Get the APK
-Pushes that change the app code run the "Build Reading Coach APK" workflow:
+Pushes that change the app code run the "Build Reading Coach APK" workflow (`.github/workflows/apk.yml`):
 
-https://github.com/devsenweb/domain-name-generator-app/releases/download/reading-coach-latest/ReadingCoach.apk
+https://github.com/devsenweb/reading-coach/releases/download/latest/ReadingCoach.apk
 
 Open that on the Android phone, tap the download, and allow "Install unknown apps" when asked.
 It installs alongside Mad Minute (different app id).
