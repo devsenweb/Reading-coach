@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -22,6 +23,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Shows the Reading Coach page. On every launch it quietly downloads the newest
@@ -57,7 +59,7 @@ public class MainActivity extends Activity {
                 ttsReady = true;
             }
         });
-        web.addJavascriptInterface(new Voice(), "AndroidVoice");
+        web.addJavascriptInterface(new Speaker(), "AndroidVoice");
         current = loadPage();
         show(current);
     }
@@ -68,10 +70,49 @@ public class MainActivity extends Activity {
         checkForUpdate();
     }
 
-    private class Voice {
+    // The page picks the voice, pitch and speed, so they can be tuned without a reinstall
+    private class Speaker {
         @JavascriptInterface
         public void speak(String text) {
             if (ttsReady && text != null) tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "cheer");
+        }
+
+        @JavascriptInterface
+        public void speakWith(String text, float pitch, float rate) {
+            if (!ttsReady || text == null) return;
+            tts.setPitch(pitch);
+            tts.setSpeechRate(rate);
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "cheer");
+        }
+
+        /** English voices installed on the phone, one per line, offline ones first. */
+        @JavascriptInterface
+        public String voices() {
+            if (!ttsReady) return "";
+            StringBuilder local = new StringBuilder(), online = new StringBuilder();
+            try {
+                Set<Voice> all = tts.getVoices();
+                if (all == null) return "";
+                for (Voice v : all) {
+                    if (v.getLocale() == null || !"en".equals(v.getLocale().getLanguage())) continue;
+                    (v.isNetworkConnectionRequired() ? online : local).append(v.getName()).append('\n');
+                }
+            } catch (Exception ignored) {
+                return "";
+            }
+            return local.toString() + online;
+        }
+
+        @JavascriptInterface
+        public boolean setVoice(String name) {
+            if (!ttsReady || name == null) return false;
+            try {
+                for (Voice v : tts.getVoices()) {
+                    if (name.equals(v.getName())) return tts.setVoice(v) == TextToSpeech.SUCCESS;
+                }
+            } catch (Exception ignored) {
+            }
+            return false;
         }
     }
 
