@@ -15,8 +15,11 @@ check if it's easy, but never hold a push or ask the owner first; just ship it a
 
 - Content (stories, questions, lessons, tips, UI) lives in `app/src/main/assets/index.html`. The
   app downloads it from `main` on every launch, so a push to `main` is the whole release.
-- Native Android changes (manifest, Kotlin/Java, icons, app id, version) trigger the APK workflow
-  (`.github/workflows/apk.yml`), which publishes to the `latest` release. Those still need one tap
-  on the phone to install from
-  https://github.com/devsenweb/reading-coach/releases/download/latest/ReadingCoach.apk, so tell
-  the owner when a change needs that.
+- Native Android changes (manifest, Java, icons, version) trigger the APK workflow
+  (`.github/workflows/apk.yml`), which publishes to the `latest` release. Always bump
+  `versionCode` in `app/build.gradle` for these: app v1.4+ compares it with its own version on
+  launch and shows an "Update" button on the home screen, which downloads the release and opens
+  Android's install screen (one confirm tap; Android requires it). Tell the owner to open the app
+  and tap Update.
+- The voice (which voice, pitch, speed) is set in `index.html` (`VOICE`), not in Java, so voice
+  tweaks need no new app version.
