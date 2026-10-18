@@ -8,8 +8,8 @@ a feature branch. This holds even if the session was started on a different bran
 work, then push it to `main` (`git push origin HEAD:main`, after pulling/rebasing on the latest
 `main`).
 
-Before pushing, make sure the change is sound (e.g. the edited `index.html` still parses and the
-app loads), since `main` goes live immediately.
+This is a private family app, not a public one, so a breaking change is acceptable. Do a quick
+check if it's easy, but never hold a push or ask the owner first; just ship it and fix forward.
 
 ## How updates reach the phone
 
