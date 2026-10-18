@@ -21,5 +21,7 @@ check if it's easy, but never hold a push or ask the owner first; just ship it a
   launch and shows an "Update" button on the home screen, which downloads the release and opens
   Android's install screen (one confirm tap; Android requires it). Tell the owner to open the app
   and tap Update.
-- The voice (which voice, pitch, speed) is set in `index.html` (`VOICE`), not in Java, so voice
-  tweaks need no new app version.
+- The voice is natural recorded clips in `app/src/main/assets/voice/`, made by
+  `tools/make_voice.py` (Kokoro TTS, voice `af_heart`). The owner disliked the robotic phone voice,
+  so whenever you add or change a spoken line (anything passed to `say()`), rerun that script and
+  commit the clips. Lines without a clip fall back to the phone's text-to-speech (`VOICE` settings).

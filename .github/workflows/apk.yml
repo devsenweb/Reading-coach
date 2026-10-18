@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
     # index.html-only changes don't need a new APK; the app downloads them itself.
-    paths: ['**', '!app/src/main/assets/**', '!**.md']
+    paths: ['**', '!app/src/main/assets/**', '!tools/**', '!**.md']
   workflow_dispatch:
 permissions:
   contents: write

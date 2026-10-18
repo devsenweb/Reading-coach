@@ -773,11 +773,11 @@ function show(id){["home","learn","lesson","quiz","done"].forEach(x=>$(x).hidden
 // ---------- cheers: sounds, voice, animations ----------
 st.snd=st.snd!==false; st.voice=st.voice!==false;
 let actx=null;
-function audio(){
-  if(!st.snd)return null;
+function ctx(){
   try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){actx=null}
   return actx;
 }
+function audio(){return st.snd?ctx():null}
 // notes: [[freq,start,len]...]; a soft bell-like tone
 function play(notes,type){
   const a=audio();if(!a)return;const t0=a.currentTime+.02;
@@ -804,8 +804,28 @@ function pickVoice(names){
   for(const p of VOICE.prefer){const i=low.findIndex(n=>n.includes(p));if(i>=0)return names[i]}
   return null;
 }
+// Natural voice: recorded clips (tools/make_voice.py) beat the phone's robotic text-to-speech.
+// Lines without a clip, or when offline, fall back to text-to-speech below.
+const CLIPS_URL="https://raw.githubusercontent.com/devsenweb/reading-coach/main/app/src/main/assets/voice/";
+let clipMap={},clipBuf={},clipSrc=null;
+function loadClips(){
+  const a=ctx();if(!a||!window.fetch)return;
+  fetch(CLIPS_URL+"index.json?t="+Date.now()).then(r=>r.json()).then(j=>{
+    clipMap=j.clips||{};
+    new Set(Object.values(clipMap)).forEach(f=>fetch(CLIPS_URL+f).then(r=>r.arrayBuffer())
+      .then(b=>new Promise((ok,no)=>a.decodeAudioData(b,ok,no))).then(buf=>{clipBuf[f]=buf}).catch(()=>{}));
+  }).catch(()=>{});
+}
+function playClip(text){
+  const buf=clipBuf[clipMap[text]],a=ctx();if(!buf||!a)return false;
+  try{if(clipSrc)clipSrc.stop()}catch(e){}
+  clipSrc=a.createBufferSource();clipSrc.buffer=buf;clipSrc.connect(a.destination);clipSrc.start(a.currentTime+.05);
+  return true;
+}
+loadClips();
 function say(text){
   if(!st.voice)return;
+  if(playClip(text))return;
   try{
     const A=window.AndroidVoice;
     if(A&&A.speakWith){
