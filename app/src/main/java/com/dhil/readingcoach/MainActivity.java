@@ -36,7 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Shows the Reading Coach page. On every launch it quietly downloads the newest
+ * Shows the Ivana School Prep page (Reading Coach, Greek & Latin, Mad Minute, weekly tests). On every launch it quietly downloads the newest
  * index.html from GitHub; if it changed, the app switches to it (right away when
  * Ivana is on the home screen, otherwise next launch). No reinstall needed.
  */
@@ -269,7 +269,7 @@ public class MainActivity extends Activity {
             if (f.exists()) return read(new FileInputStream(f));
             return read(getAssets().open("index.html"));
         } catch (Exception e) {
-            return "<h1>Could not load Reading Coach</h1>";
+            return "<h1>Could not load School Prep</h1>";
         }
     }
 
@@ -296,7 +296,7 @@ public class MainActivity extends Activity {
             c.setUseCaches(false);
             if (c.getResponseCode() != 200) return;
             String fresh = read(c.getInputStream());
-            if (!fresh.contains("Reading Coach") || fresh.equals(current)) return;
+            if (!(fresh.contains("School Prep") || fresh.contains("Reading Coach")) || fresh.equals(current)) return;
             try (FileOutputStream out = new FileOutputStream(cacheFile())) {
                 out.write(fresh.getBytes(StandardCharsets.UTF_8));
             }
@@ -311,7 +311,7 @@ public class MainActivity extends Activity {
                                     if ("true".equals(onHome)) {
                                         current = fresh;
                                         show(fresh);
-                                        Toast.makeText(MainActivity.this, "Reading Coach updated", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this, "School Prep updated", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });

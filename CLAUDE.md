@@ -1,4 +1,8 @@
-# Reading Coach: notes for Claude
+# Ivana School Prep (formerly Reading Coach): notes for Claude
+
+The app id, repo name, APK name and update URLs stay `readingcoach` so the installed app keeps
+updating itself. The page must keep containing the text "Reading Coach" or "School Prep": older
+apps only accept a downloaded page that contains "Reading Coach".
 
 ## Shipping changes: push straight to `main`, no PR
 

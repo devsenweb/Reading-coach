@@ -10,7 +10,7 @@
         </intent>
     </queries>
     <application
-        android:label="Reading Coach"
+        android:label="Ivana School Prep"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:theme="@style/AppTheme"
