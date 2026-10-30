@@ -198,6 +198,11 @@ mark.b{background:rgba(242,183,5,.28);background:color-mix(in srgb,var(--pencil)
 .rcard ul{margin:6px 0 0;padding-left:1.1em;font-size:.9rem;line-height:1.45}
 .rcard ul i{font-style:normal;font-weight:600}
 .small{font:600 .85rem var(--body);padding:8px 12px;border-radius:10px;border:2px solid var(--ink);background:transparent}
+/* NOT / EXCEPT questions: the word is marked and she confirms before answering */
+mark.neg{background:var(--red-bg);color:var(--red);font-weight:800;padding:0 .2em;border-radius:4px;border-bottom:3px solid var(--red)}
+.negok{display:block;width:100%;margin:0 0 10px;padding:10px 12px;border-radius:12px;border:2px dashed var(--red);background:var(--red-bg);color:var(--ink);font:600 .92rem var(--body);text-align:left}
+.negok[aria-pressed="true"]{border-style:solid;background:var(--card);color:var(--muted)}
+.choices.locked{opacity:.4;pointer-events:none}
 /* Mad Minute runs in its own frame so its code and styles stay separate */
 #mm{position:fixed;inset:0;z-index:40;background:var(--paper)}
 #mm iframe{display:block;width:100%;height:100%;border:0}
@@ -218,6 +223,9 @@ mark.b{background:rgba(242,183,5,.28);background:color-mix(in srgb,var(--pencil)
     <button class="tile" id="goRC"><span class="ic">📖</span><span><b>Reading Coach</b><small id="rcSub"></small></span></button>
     <button class="tile" id="goGL"><span class="ic">🏛️</span><span><b>Greek &amp; Latin</b><small id="glSub"></small></span></button>
     <button class="tile" id="goMM"><span class="ic">⏱️</span><span><b>Mad Minute</b><small id="mmSub"></small></span></button>
+    <button class="tile" id="go_math"><span class="ic">✖️</span><span><b>Math</b><small id="sub_math"></small></span></button>
+    <button class="tile" id="go_ss"><span class="ic">🏕️</span><span><b>Social Studies</b><small id="sub_ss"></small></span></button>
+    <button class="tile" id="go_sci"><span class="ic">🧊</span><span><b>Science</b><small id="sub_sci"></small></span></button>
   </div>
   <div class="panel">
     <p class="label" id="wkLabel">This week's tests</p>
@@ -297,6 +305,35 @@ mark.b{background:rgba(242,183,5,.28);background:color-mix(in srgb,var(--pencil)
   <p class="muted">Each column is one week (Monday to Sunday). Test grades are your first try that week.</p>
   <div class="rtable" id="reportTable"></div>
   <p class="muted" id="reportNote"></p>
+</div>
+
+<div class="wrap" id="subj" hidden>
+  <div class="top"><h2 style="font-family:var(--display);font-size:1.8rem" id="sjHead">Subject</h2><button class="ghost" id="sjBack">All subjects</button></div>
+  <p class="sub" style="margin-top:-8px" id="sjIntro"></p>
+  <div class="menu">
+    <button class="tile hot" id="sjQuiz"><span class="ic" id="sjIcon">📝</span><span><b id="sjTitle">Level 1</b><small id="sjLvSub"></small></span></button>
+    <button class="tile" id="sjStudy"><span class="ic">📚</span><span><b>Study notes</b><small id="sjStudySub">The facts to know, topic by topic</small></span></button>
+    <button class="tile" id="sjMiss"><span class="ic">🔁</span><span><b>Fix my mistakes</b><small id="sjMissSub"></small></span></button>
+  </div>
+  <div class="panel">
+    <p class="label">Levels</p>
+    <div class="ladders" id="sjLadders"></div>
+    <p class="muted" style="margin-top:10px">Pass a level twice to unlock the next one. Each level is harder. Tap an open level to practice it again.</p>
+  </div>
+  <div class="panel">
+    <p class="label">Practice one topic</p>
+    <div class="pick" id="sjTopics"></div>
+  </div>
+  <div class="panel">
+    <p class="label">Recent practice</p>
+    <div class="hist" id="sjHist"></div>
+  </div>
+</div>
+
+<div class="wrap" id="notes" hidden>
+  <div class="top"><h2 style="font-family:var(--display);font-size:1.8rem" id="notesHead">📚 Study notes</h2><button class="ghost" id="notesBack">Back</button></div>
+  <p class="muted">Read each card out loud, then practice that topic.</p>
+  <div id="notesList"></div>
 </div>
 
 <div id="mm" hidden></div>
@@ -1281,6 +1318,236 @@ Object.assign(TIPS,{
  "Words with a root":["Look for the root's letters hiding inside each word: *spect* is in *inspect* and *spectator*.","Some roots change spelling a little: *mit* / *miss*, *vers* / *vert*."],
  "Words in sentences":["Read the whole sentence first and think about what it is talking about.","Then try each word in the blank and pick the one whose root meaning fits."]
 });
+// ---------- Greek & Latin class units (from her Wednesday folder; newest unit last) ----------
+// Unit 9 (test came home 10/28). photo, graph and bio moved here from the starter units so each root lives in one unit.
+GL_UNITS.push(
+{id:"u9",name:"Unit 9 (class): biblio, phil, soph, photo, bio, graph",roots:[
+ {r:"biblio",alt:["bibli"],o:"Greek",m:"book",w:[
+  ["bibliophile","a person who loves books","Her room is full of stacked books; she is a true ___."],
+  ["bibliography","a list of the books used to write a report","At the end of my report, I listed my sources in a ___."]]},
+ {r:"phil",o:"Greek",m:"love",w:[
+  ["philosophy","a set of ideas about how to live; the love of wisdom","His ___ of friendship was to always tell the truth."],
+  ["philanthropist","a person who gives money or time to help others","The ___ gave a million dollars to build a new hospital."],
+  ["philharmonic","an orchestra (people who love music and harmony)","We heard the ___ play at the concert hall."]]},
+ {r:"soph",o:"Greek",m:"wisdom",w:[
+  ["sophomore","a student in the second year of high school or college","My cousin is a ___ in high school this year."],
+  ["sophisticated","wise about the world; complicated and advanced","The robot has a ___ computer inside it."]]},
+ {r:"photo",alt:["phot"],o:"Greek",m:"light",w:[
+  ["photosynthesis","how plants use light to make their food","The plant died in the dark room because ___ is not possible without light."],
+  ["photography","the art of taking pictures with light and a camera","I want to learn ___, but first I need a camera."],
+  ["photon","a tiny bit of light energy","A ___ is far too small to see by itself."],
+  ["photograph","a picture made with light by a camera","Mom framed a ___ of our family trip."]]},
+ {r:"bio",o:"Greek",m:"life",w:[
+  ["biology","the study of living things","In ___, we learned how frogs grow."],
+  ["biography","a true story written about someone's life","Megan wrote a ___ of Martin Luther King, Jr."],
+  ["biodegradable","able to be broken down by living things like bacteria","The ___ bag will rot away in the soil."]]},
+ {r:"graph",o:"Greek",m:"write",w:[
+  ["autograph","a person's name written in their own hand","The author signed her ___ in my book."],
+  ["paragraph","a group of written sentences about one idea","Read the second ___ of the story again."]]}
+],
+extra:[
+ {lvl:2,skill:"Spelling root words",q:"Which is the correct spelling of the word for a person who loves books?",choices:["bibliophile","bibliofile","biblophile","bibleophile"],a:0,why:"*biblio* (book) + *phile* (one who loves) = *bibliophile*. Both parts keep their spelling: b-i-b-l-i-o + p-h-i-l-e."},
+ {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["photosynthesis","fotosynthesis","photosinthesis","photosynthisis"],a:0,why:"The root *photo* (light) is spelled with *ph*. Then *synthesis*: s-y-n-t-h-e-s-i-s."},
+ {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["philosophy","philosofy","filosophy","philosphy"],a:0,why:"Two roots, both with *ph*: *philo* (love) + *sophy* (wisdom) = *philosophy*."},
+ {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["biography","biografy","biograph","byography"],a:0,why:"*bio* (life) + *graph* (write) + *y* = *biography*. The *f* sound is spelled *ph*."},
+ {lvl:2,skill:"Synonyms & antonyms",q:"Choose an ANTONYM (opposite) for *biodegradable*.",choices:["plastic","perishable","green","indestructible"],a:3,why:"*Biodegradable* means it can break down. The opposite is *indestructible*: it can't be broken down at all."},
+ {lvl:2,skill:"Synonyms & antonyms",q:"Choose a SYNONYM (same meaning) for *philanthropist*.",choices:["money","charity","donor","thief"],a:2,why:"A *philanthropist* gives money to help people, and so does a *donor*. *Charity* is the group that gets the money, not the person."},
+ {lvl:3,skill:"Synonyms & antonyms",q:"Which word is the OPPOSITE of a *philanthropist*?",choices:["a miser (someone who keeps all their money)","a donor","a volunteer","a helper"],a:0,why:"A *philanthropist* loves people and gives. A *miser* keeps everything for themself."},
+ {lvl:2,skill:"Analogies",q:"Complete the analogy: ___ : continent :: Philadelphia : city",choices:["Asia","America","country","Kansas"],a:0,why:"Philadelphia IS A city, so the blank IS A continent: *Asia*. (Kansas is a state, and *country* is not a continent.)"},
+ {lvl:3,skill:"Analogies",q:"Complete the analogy: biology : life :: photography : ___",choices:["light","camera","picture","write"],a:0,why:"*bio* in *biology* means life. *photo* in *photography* means light. Match the ROOT meaning."},
+ {lvl:3,skill:"Analogies",q:"Complete the analogy: bibliophile : books :: philanthropist : ___",choices:["people","money","music","wisdom"],a:0,why:"A bibliophile loves books; a philanthropist loves people (*anthrop* = human)."},
+ {lvl:3,skill:"NOT questions",q:"What would NOT be a topic you study in *biology*?",choices:["the life span of tree frogs","Earth's magnetic poles","how plants reproduce","why some animals became extinct"],a:1,why:"*Biology* is the study of LIFE. Frogs, plants and animals are alive. Earth's magnetic poles are not living, so they are NOT biology. Find the three that ARE true first, then the leftover one is the answer."},
+ {lvl:3,skill:"NOT questions",q:"Which statement is NOT true about *photons*?",choices:["They are so small you cannot see one by itself.","You can have light without photons.","Plants use light energy in photosynthesis.","Without light, life as we know it could not exist."],a:1,why:"Light IS made of photons, so you can NOT have light without them. The other three are true. In a NOT question, the answer is the one FALSE sentence."},
+ {lvl:3,skill:"NOT questions",q:"Which word does NOT have a root that means “love”?",choices:["philosophy","philanthropist","philharmonic","photograph"],a:3,why:"*phil* means love. *photograph* starts with *photo* (light), not *phil*."},
+ {lvl:3,skill:"NOT questions",q:"Which would a *bibliophile* NOT enjoy?",choices:["a trip to the library","a new book series","a bookstore gift card","a whole week with no books allowed"],a:3,why:"A bibliophile LOVES books, so a week with no books is the one thing they would NOT enjoy."},
+ {lvl:3,skill:"NOT questions",q:"Which statement is NOT true about a *biography*?",choices:["It tells about a real person's life.","It is written by someone other than that person.","It is a made-up story about a talking animal.","It can be about a famous leader."],a:2,why:"*bio* (life) + *graph* (write): a true story written about a real life. A made-up story is NOT a biography."}
+]}
+);
+// take the Unit 9 roots out of the starter units
+GL_UNITS.forEach(u=>{if(u.id.startsWith("s")){u.starter=true;u.roots=u.roots.filter(x=>!["photo","graph","bio"].includes(x.r))}});
+Object.assign(TIPS,{
+ "Spelling root words":["Spell a root word one root at a time: *biblio* + *phile*, *photo* + *synthesis*.","Greek roots spell the *f* sound with *ph*: *photo*, *phil*, *graph*."],
+ "Synonyms & antonyms":["*Synonym* = same meaning. *Antonym* = opposite meaning. Circle which one the question asks for.","Use the root: *bio* (life) + *degradable* (break down). The opposite can't break down at all."],
+ "Analogies":["Say the first pair as a sentence: *Philadelphia IS A city.* Then use the same sentence for the other pair: *___ IS A continent.*","Check that the relationship matches exactly, not just the topic."],
+ "NOT questions":["Circle the word NOT. Three answers are TRUE and one is FALSE. The false one is your answer.","Check each answer: write T or F next to it. Cross off each T. Don't pick the first answer that sounds right."]
+});
+
+// ---------- Math, Social Studies and Science ----------
+// Same ladder and scoring as grammar. Each topic has notes (Study notes screen) and questions.
+// Question: {lvl, type:"mc"|"multi", q, choices, a (index, or [..] for choose two), why}. Write NOT and EXCEPT in capitals.
+const SUBJ={};
+const sq=(lvl,q,choices,a,why)=>({lvl,type:Array.isArray(a)?"multi":"mc",q,choices,a,why});
+
+// Math: Unit 2 multi-digit multiplication. Problems are made from a fixed seed, so every question keeps its id.
+SUBJ.math=(()=>{
+  let s=20261030;
+  const R=()=>{s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+  const ri=(a,b)=>a+Math.floor(R()*(b-a+1));
+  const n=x=>x.toLocaleString("en-US");
+  const r10=x=>Math.round(x/10)*10;
+  // the right answer first, then up to three different wrong ones (filled with near misses if needed)
+  const opts=(ans,ws)=>{const out=[ans];ws.forEach(w=>{if(w>0&&Number.isInteger(w)&&!out.includes(w)&&out.length<4)out.push(w)});for(let k=1;out.length<4;k++){const w=ans+(k%2?1:-1)*10*Math.ceil(k/2);if(w>0&&!out.includes(w))out.push(w)}return out.map(n)};
+  const two=()=>{let x=ri(21,98);if(x%10===0)x+=3;return x};
+  const pairs=(k,f)=>{const seen=new Set(),o=[];while(o.length<k){const p=f(),key=p.join("x");if(!seen.has(key)){seen.add(key);o.push(p)}}return o};
+  const parts=(a,b)=>{const ta=a-a%10,oa=a%10,tb=b-b%10,ob=b%10;return {ta,oa,tb,ob,P:[ta*tb,ta*ob,oa*tb,oa*ob]}};
+  const est=[],ones=[],area=[],solve=[];
+  pairs(8,()=>[two(),two()]).forEach(([a,b])=>{const ea=r10(a),eb=r10(b),e=ea*eb,lo=Math.floor(a/10)*10*Math.floor(b/10)*10;
+    est.push(Object.assign(sq(1,"Round each number to the nearest ten to *estimate*: "+a+" × "+b,opts(e,[lo===e?e+ea:lo,e*10,e/10,ea+eb]),0,
+      a+" rounds to "+ea+" and "+b+" rounds to "+eb+". "+ea+" × "+eb+" = "+n(e)+"."),{key:"est"+a+"x"+b}))});
+  pairs(6,()=>[ri(2,9)*10,ri(2,9)*10]).forEach(([a,b])=>{const e=a*b;
+    est.push(Object.assign(sq(1,"What is "+a+" × "+b+"?",opts(e,[e/10,e*10,a+b]),0,
+      "Multiply the front digits: "+a/10+" × "+b/10+" = "+a*b/100+". Then add the two zeros: "+n(e)+"."),{key:"tens"+a+"x"+b}))});
+  pairs(10,()=>[ri(12,98),ri(3,9)]).forEach(([a,b])=>{const e=a*b,t=a-a%10,o=a%10;
+    ones.push(Object.assign(sq(1,"What is "+a+" × "+b+"?",opts(e,[t*b+(o*b)%10,e+10,e-10,a+b]),0,
+      "Break it apart: "+t+" × "+b+" = "+n(t*b)+" and "+o+" × "+b+" = "+o*b+". Add them: "+n(e)+"."),{key:"one"+a+"x"+b}))});
+  pairs(10,()=>[two(),two()]).forEach(([a,b])=>{const {ta,oa,tb,ob,P}=parts(a,b),e=a*b,j=x=>x.map(n).join(" + ");
+    area.push(Object.assign(sq(2,"Which shows the four parts of an area model for "+a+" × "+b+"?",[j(P),j([P[0]/10,P[1],P[2],P[3]]),j([P[0],P[1]/10,P[2]/10,P[3]]),j([P[0]/100,P[1]/10,P[2]/10,P[3]])],0,
+      ta+" × "+tb+" = "+n(P[0])+", "+ta+" × "+ob+" = "+n(P[1])+", "+oa+" × "+tb+" = "+n(P[2])+", "+oa+" × "+ob+" = "+n(P[3])+". Count the zeros in each part."),{key:"am"+a+"x"+b}));
+    area.push(Object.assign(sq(2,"An area model for "+a+" × "+b+" has these parts: "+n(P[0])+" + "+n(P[1])+" + ___ + "+n(P[3])+". What is the missing part?",opts(P[2],[P[2]/10,P[2]*10,oa*ob]),0,
+      "The missing box is "+oa+" × "+tb+" = "+n(P[2])+"."),{key:"amm"+a+"x"+b}));
+    solve.push(Object.assign(sq(2,"What is "+a+" × "+b+"?",opts(e,[a*ob+a*(tb/10),e+100,e-100,e+1000]),0,
+      "Area model: "+P.map(n).join(" + ")+" = "+n(e)+". Check: "+r10(a)+" × "+r10(b)+" = "+n(r10(a)*r10(b))+", which is close."),{key:"mul"+a+"x"+b}))});
+  pairs(8,()=>[two(),two()]).forEach(([a,b],i)=>{const e=a*b,est=r10(a)*r10(b),{tb,ob}=parts(a,b),bad=a*ob+a*(tb/10),claim=i%2?bad:e,ok=claim===e;
+    const nm=["Ana","Leo","Maya","Sam"][i%4];
+    solve.push(Object.assign(sq(3,nm+" says "+a+" × "+b+" = "+n(claim)+". Estimate to check. Is the answer reasonable?",
+      ok?["Yes. It is close to the estimate "+n(est)+".","No. It should be close to "+n(est/10)+".","No. It should be close to "+n(est*10)+".","Yes, because "+a+" + "+b+" = "+(a+b)+"."]
+        :["No. It should be close to "+n(est)+".","Yes. It is close to the estimate "+n(est)+".","Yes. Big numbers always make big answers.","No. It should be close to "+n(est*10)+"."],0,
+      "Estimate: "+r10(a)+" × "+r10(b)+" = "+n(est)+". The exact answer is "+n(e)+(ok?", so "+nm+" is right.":". "+nm+" forgot the zero when multiplying by the tens digit.")),{key:"chk"+a+"x"+b}))});
+  const WORD=["A theater has {a} rows with {b} seats in each row. How many seats are there in all?","A school orders {a} boxes of pencils. Each box holds {b} pencils. How many pencils is that?","A farmer plants {a} rows of strawberries with {b} plants in each row. How many plants is that?","Ivana reads {b} pages a day for {a} days. How many pages does she read?","A baker makes {a} trays of cookies with {b} cookies on each tray. How many cookies is that?","Each of the {a} classes at a school collects {b} cans of food. How many cans is that in all?","A garden is {a} feet long and {b} feet wide. What is its area in square feet?","A bus carries {b} students. How many students can {a} buses carry?"];
+  pairs(8,()=>[two(),ri(12,49)]).forEach(([a,b],i)=>{const e=a*b,{tb,ob}=parts(a,b);
+    solve.push(Object.assign(sq(3,WORD[i].replace("{a}",a).replace("{b}",b),opts(e,[a+b,a*ob+a*(tb/10),e+100]),0,
+      "Multiply "+a+" × "+b+" = "+n(e)+". Estimate to check: "+r10(a)+" × "+r10(b)+" = "+n(r10(a)*r10(b))+"."),{key:"wp"+a+"x"+b}))});
+  pairs(6,()=>[two(),two()]).forEach(([a,b])=>{const {ta,oa,tb,ob}=parts(a,b);
+    solve.push(Object.assign(sq(3,"Which is NOT a correct way to find "+a+" × "+b+"?",["("+a+" × "+tb/10+") + ("+a+" × "+ob+")","("+ta+" × "+b+") + ("+oa+" × "+b+")","("+a+" × "+tb+") + ("+a+" × "+ob+")","("+b+" × "+ta+") + ("+b+" × "+oa+")"],0,
+      "The tens digit of "+b+" stands for "+tb+", not "+tb/10+". So ("+a+" × "+tb/10+") is wrong. The other three break apart a number the right way."),{key:"not"+a+"x"+b}))});
+  return {name:"Math",icon:"✖️",intro:"Unit 2: multiplying big numbers. Estimate, area model, then solve.",
+   levels:[
+    {name:"Estimate",desc:"Round to the nearest ten, multiply tens, 2-digit × 1-digit.",need:.8,mix:{1:1},n:10,test:false},
+    {name:"Area model",desc:"Find the four parts, then 2-digit × 2-digit.",need:.9,mix:{1:.3,2:1},n:10,test:false},
+    {name:"Solve & check",desc:"Word problems, check with an estimate, NOT questions.",need:.9,mix:{2:.4,3:1},n:10,test:false},
+    {name:"Test day",desc:"12 questions from every topic, test mode.",need:.9,mix:{2:.6,3:1},n:12,test:true}],
+   topics:[
+    {id:"est",name:"Estimating products",notes:["Round each number to the nearest ten: 68 → 70, 97 → 100.","Multiply the front digits, then add all the zeros: 70 × 100 → 7 × 1 = 7, add 3 zeros → 7,000.","Estimate FIRST, then solve. If your answer is far from the estimate, check your work."],qs:est},
+    {id:"ones",name:"2-digit × 1-digit",notes:["Break the big number into tens and ones: 47 × 6 = (40 × 6) + (7 × 6) = 240 + 42 = 282.","Don't forget to carry the extra tens."],qs:ones},
+    {id:"area",name:"Area model",notes:["Split both numbers into tens and ones: 42 × 56 → (40 + 2) × (50 + 6).","Draw a box with 4 parts: 40 × 50 = 2,000 · 40 × 6 = 240 · 2 × 50 = 100 · 2 × 6 = 12.","Add the four parts: 2,000 + 240 + 100 + 12 = 2,352.","Count zeros: tens × tens has two zeros, tens × ones has one zero."],qs:area},
+    {id:"mul",name:"2-digit × 2-digit",notes:["Use any method: area model or two rows (ones row, then tens row).","In the tens row, put a 0 first because you are multiplying by tens.","Check with an estimate: 58 × 86 ≈ 60 × 90 = 5,400, so 4,988 makes sense.","Word problems: rows of, boxes of, each, in all → multiply."],qs:solve}]};
+})();
+
+SUBJ.ss={name:"Social Studies",icon:"🏕️",intro:"Unit 2: California's Native Peoples (TCI Lesson 2).",
+ levels:[
+  {name:"Words",desc:"Key words and who did what.",need:.8,mix:{1:1},n:10,test:false},
+  {name:"Regions",desc:"The six regions: where people lived and how they got food.",need:.9,mix:{1:.3,2:1},n:10,test:false},
+  {name:"Think it through",desc:"Compare regions, choose two, NOT questions.",need:.9,mix:{2:.4,3:1},n:10,test:false},
+  {name:"Test day",desc:"12 questions from every topic, test mode.",need:.9,mix:{2:.6,3:1},n:12,test:true}],
+ topics:[
+ {id:"words",name:"Key words & village life",notes:["*Culture*: a group's way of life (food, homes, clothes, beliefs, customs).","*Environment*: the land, water, plants, animals and weather around you. To *adapt* is to change how you live to fit it.","*Natural resources*: things from nature people use, like water, trees, plants and animals.","*Nomad*: a person who moves from place to place in search of food.","The *chief* was the most important person in a village. The *shaman* was second: a healer and religious leader.","California Indians deeply respected nature and took only what they needed."],qs:[
+  sq(1,"Each group of American Indians had its own way of life. What is another word for a group's way of life?",["culture","climate","region","landform"],0,"*Culture* means a way of life: food, homes, clothes, beliefs and customs."),
+  sq(1,"What is a *nomad*?",["a person who moves from place to place in search of food","a person who stays on one farm all year","the leader of a village","a person who weaves baskets"],0,"Nomads keep moving to find food. Great Basin peoples were nomads."),
+  sq(1,"Who was usually the MOST important person in an Indian village?",["the chief","the shaman","the best hunter","the youngest child"],0,"The chief led the village. The shaman came second."),
+  sq(1,"The chief was the most important person in a village. Who was the second most important?",["the shaman","the basket maker","the fisher","the trader"],0,"The *shaman* was second after the chief."),
+  sq(1,"What did a shaman do?",["healed sick people and led religious ceremonies","built all the houses","traded shells with other villages","made the village laws alone"],0,"A shaman was a healer and a spiritual (religious) leader."),
+  sq(1,"How did California Indians feel about nature?",["They deeply respected it.","They were afraid of it.","They did not care about it.","They wanted to change all of it."],0,"California Indians respected nature and took only what they needed."),
+  sq(1,"To *adapt* to your environment means to —",["change the way you live to fit where you live","move to a new country","build a big city","forget your culture"],0,"Adapting means fitting your life to your surroundings, like making rain capes in a rainy place."),
+  sq(1,"Which of these is a *natural resource*?",["trees","a car","a computer","a plastic cup"],0,"Natural resources come from nature: trees, water, plants, animals."),
+  sq(2,"Why did different Indian groups have different cultures?",["They lived in different environments with different natural resources.","They all came from different countries.","Each group had a different king.","They didn't want to be like each other."],0,"The land, weather and resources were different in each region, so food, homes and clothes were different too."),
+  sq(3,"Which was NOT a job of the shaman?",["healing sick people","leading ceremonies","being the most important person in the village","praying for help from the spirits"],2,"The CHIEF was the most important person. The shaman was second. Find the three true jobs first; the leftover one is the answer."),
+  sq(3,"Which was NOT a way California Indians used natural resources?",["weaving baskets from reeds and grasses","making capes from tree bark","grinding acorns into flour","buying food at a market"],3,"There were no markets. People got everything from nature. The other three are real ways they used resources.")]},
+ {id:"regions",name:"The six regions",notes:["*Northwest*: lots of rain and thick forests. Houses of wooden planks; waterproof capes of tree bark. Showed wealth by wearing strings of rare seashells.","*Northeast*: mountains and forests. Mostly hunters and gatherers. Women wove baskets from reeds and grasses.","*Central Valley*: every group gathered acorns that fell from oak trees, ground them into flour and rinsed out the bitter taste.","*Great Basin*: dry desert land EAST of the Sierra Nevada (east only!). Little food, so people were nomads.","*Southern (coast)*: food was easier to find near the ocean: fish, shellfish, sea animals.","*Colorado River*: unlike other California Indians, they lived by farming. River floods left wet, rich soil."],qs:[
+  sq(1,"Some Northwest Indians showed their wealth by —",["wearing strings of rare seashells","owning many horses","building tall stone towers","wearing gold crowns"],0,"Rare seashells were valuable, so wearing strings of them showed wealth."),
+  sq(1,"Indians of the Northeast were mostly —",["hunters and gatherers","farmers","fishers on the ocean","traders who sold horses"],0,"They hunted animals and gathered plants."),
+  sq(1,"What did women of the Northeast make with the reeds and grasses they collected?",["baskets","canoes","houses of stone","clay pots"],0,"They wove reeds and grasses into baskets."),
+  sq(1,"Every Indian group in the Central Valley gathered ___ dropped by oak trees.",["acorns","apples","pine cones","walnuts"],0,"Acorns from oak trees were the main food of the Central Valley."),
+  sq(2,"The Great Basin area lies ___ of the Sierra Nevada.",["east","north","west","south"],0,"The Great Basin is EAST of the Sierra Nevada. Only east, not north."),
+  sq(2,"Why were the Indians of the Great Basin nomads?",["Their dry land had little food in one place, so they moved to find it.","They liked to travel to big cities.","Their houses kept falling down.","The chief told them to visit other regions."],0,"The Great Basin is dry, with little water and food, so people moved from place to place in search of food."),
+  sq(2,"For Indians of the Southern area, what was one advantage of living close to the ocean?",["Food was easier to find near the ocean.","The ocean kept them warm in winter.","They could farm in the sand.","There were no animals near the ocean."],0,"The ocean had fish, shellfish and sea animals, so food was easier to get."),
+  sq(2,"Unlike other California Indians, those of the Colorado River area —",["lived by farming","never ate meat","lived in snow houses","did not have villages"],0,"The Colorado River peoples were farmers."),
+  sq(2,"What is one example of how the Northwest Indians adapted to their rainy environment?",["They made waterproof capes from tree bark.","They built houses from snow.","They dug wells in the desert.","They farmed corn in the dry valley."],0,"The Northwest is rainy, so waterproof bark capes kept them dry."),
+  sq(2,"How did the Colorado River floods help farmers?",["The floods left wet, rich soil for planting.","The floods washed all the crops away every year.","The floods brought ocean fish.","The floods made the land colder."],0,"When the river flooded, it left wet, rich soil where crops grew well."),
+  sq(2,"Acorns taste very bitter. How did Central Valley people make them good to eat?",["They ground them into flour and rinsed it with water many times.","They ate them right off the tree.","They mixed them with sugar.","They fed them to horses first."],0,"Grinding and rinsing (leaching) washed out the bitter taste."),
+  sq(2,"Which region had lots of rain and thick forests?",["Northwest","Great Basin","Colorado River","Southern"],0,"The Northwest was rainy and full of tall trees."),
+  sq(3,"Which TWO groups got most of their food by hunting and gathering, not farming?",["Indians of the Northeast","Indians of the Great Basin","Indians of the Colorado River","none of them; they all farmed"],[0,1],"Northeast peoples hunted and gathered, and Great Basin nomads gathered food as they moved. Colorado River peoples farmed."),
+  sq(3,"Which TWO things did Northwest Indians make from trees?",["waterproof capes","plank houses","baskets of desert grass","stone tools"],[0,1],"Bark capes and wooden plank houses both came from the forest's trees."),
+  sq(3,"Which statement is NOT true about the Great Basin?",["It is east of the Sierra Nevada.","It is dry, with little water.","Its people were nomads.","It is north of the Sierra Nevada and very rainy."],3,"The Great Basin is EAST of the Sierra Nevada and dry. That makes the last sentence false, so it is the answer."),
+  sq(3,"How were Great Basin peoples DIFFERENT from Colorado River peoples?",["Great Basin peoples moved to find food; Colorado River peoples stayed and farmed.","Great Basin peoples farmed; Colorado River peoples were nomads.","Both groups lived by the ocean.","Both groups were rich in seashells."],0,"Great Basin = nomads who moved for food. Colorado River = farmers."),
+  sq(3,"Which is NOT one of the six California Indian regions you studied?",["Rocky Mountains","Northwest","Great Basin","Central Valley"],0,"The six regions are Northwest, Northeast, Central Valley, Great Basin, Southern and Colorado River. The Rocky Mountains are NOT in California."),
+  sq(3,"Why were rare seashells a good way for Northwest Indians to show wealth?",["They were hard to get, so having many showed you were rich.","They were easy to find on every beach.","They were used to build houses.","Everyone had the same number of them."],0,"Rare means hard to find. Things that are hard to get are valuable, like money.")]}
+ ]};
+
+SUBJ.sci={name:"Science",icon:"🧊",intro:"DQ 4: how ice and wind change the land (weathering, erosion, deposition).",
+ levels:[
+  {name:"Words",desc:"Weathering, erosion, deposition, glaciers.",need:.8,mix:{1:1},n:10,test:false},
+  {name:"Ice & wind",desc:"How glaciers and wind shape the land.",need:.9,mix:{1:.3,2:1},n:10,test:false},
+  {name:"Think it through",desc:"Explain, compare, NOT questions.",need:.9,mix:{2:.4,3:1},n:10,test:false},
+  {name:"Test day",desc:"12 questions from every topic, test mode.",need:.9,mix:{2:.6,3:1},n:12,test:true}],
+ topics:[
+ {id:"wed",name:"Weathering, erosion, deposition",notes:["*Weathering*: breaking rock into smaller pieces (ice in cracks, sand blowing on rock).","*Erosion*: MOVING the pieces away (by wind, water, ice or gravity).","*Deposition*: DROPPING the pieces in a new place.","*Sediment*: small bits of rock, sand and soil.","Plant roots hold soil in place and slow erosion."],qs:[
+  sq(1,"Breaking rock into smaller pieces is called —",["weathering","erosion","deposition","melting"],0,"*Weathering* breaks rock. Erosion moves it. Deposition drops it."),
+  sq(1,"Moving bits of rock and soil from one place to another is called —",["erosion","weathering","deposition","freezing"],0,"*Erosion* = moving the pieces away."),
+  sq(1,"Dropping sand, soil and rocks in a new place is called —",["deposition","erosion","weathering","evaporation"],0,"*Deposition* = dropping (depositing) the pieces somewhere new."),
+  sq(1,"Small bits of rock, sand and soil are called —",["sediment","magma","minerals","fossils"],0,"*Sediment* is the small pieces that wind, water and ice carry."),
+  sq(1,"Which can cause erosion?",["all of these","wind","moving ice","water"],0,"Wind, water, ice and gravity can all move rock and soil."),
+  sq(1,"Which is the BEST example of weathering?",["Water freezes in a crack and splits a rock.","Wind carries sand across a beach.","A river drops mud at its mouth.","A truck carries rocks to a building."],0,"Splitting the rock breaks it into pieces. That is weathering."),
+  sq(1,"How do plants help stop erosion?",["Their roots hold soil in place.","They make the wind stronger.","They melt glaciers.","They push rocks downhill."],0,"Roots grip the soil so wind and water can't carry it away as easily."),
+  sq(2,"What is the difference between weathering and erosion?",["Weathering breaks rock; erosion moves it.","Weathering moves rock; erosion breaks it.","They mean the same thing.","Weathering only happens in summer."],0,"Break = weathering. Move = erosion."),
+  sq(3,"Which is NOT an example of erosion?",["a rock staying in the same spot for 100 years","wind blowing soil off a field","a glacier carrying boulders downhill","a river carrying mud to the sea"],0,"Erosion means moving. A rock that stays put is NOT being moved."),
+  sq(3,"Which TWO are causes of erosion?",["wind","moving ice","the color of a rock","the moon's light"],[0,1],"Wind and moving ice (glaciers) carry rock and soil away.")]},
+ {id:"ice",name:"Glaciers",notes:["A *glacier* is a huge, thick sheet of ice that moves very slowly downhill because of its weight.","Rocks frozen in the bottom of a glacier scrape the ground and leave long scratches.","Glaciers pick up and carry boulders. When the ice melts, they drop them.","A *moraine* is a pile of rocks and soil left by a glacier.","Glaciers carve valleys into a U shape. Yosemite Valley was shaped by glaciers.","Today most glaciers are near the North and South Poles and on tall mountains."],qs:[
+  sq(1,"A glacier is —",["a huge sheet of ice that moves slowly","a fast river","a pile of sand made by wind","a kind of volcano"],0,"Glaciers are giant, thick sheets of ice that creep downhill."),
+  sq(1,"How fast do glaciers move?",["very slowly","faster than a car","as fast as wind","they never move"],0,"Glaciers move very slowly, sometimes just inches a day."),
+  sq(1,"A *moraine* is —",["a pile of rocks and soil dropped by a glacier","a crack in a glacier","a sand dune","a kind of ice cave"],0,"When a glacier melts it drops what it carried. The piles are moraines."),
+  sq(2,"Why does a glacier leave long scratches on bedrock?",["Rocks stuck in the ice scrape the ground as it moves.","The sun melts lines into the rock.","Animals walk on the ice.","Wind blows the ice sideways."],0,"Rocks frozen into the bottom work like sandpaper."),
+  sq(2,"Glaciers carve valleys into what shape?",["a U shape","a V shape","a circle","a zigzag"],0,"Rivers cut V-shaped valleys. Glaciers scrape them wide into a U shape."),
+  sq(2,"Which California valley was shaped by glaciers?",["Yosemite Valley","Death Valley","the Central Valley","Silicon Valley"],0,"Glaciers carved Yosemite Valley into a wide U shape with steep walls."),
+  sq(2,"Where are most glaciers found today?",["near the poles and on tall mountains","in deserts","at the bottom of the ocean","in rain forests"],0,"Glaciers need cold places where snow builds up year after year."),
+  sq(2,"What happens to the rocks a glacier carries when the ice melts?",["They are dropped in new places.","They float up into the sky.","They turn into water.","They go back to where they started."],0,"Melting ice drops the rocks: that is deposition."),
+  sq(3,"Scientists find a huge boulder sitting alone in a flat field, far from any mountain. What is the BEST explanation?",["A glacier carried it there long ago and dropped it when it melted.","Wind blew it there last week.","A river carried it uphill.","It grew there from a small rock."],0,"Wind can't move a boulder. Glaciers can carry giant rocks far away and drop them."),
+  sq(3,"How is a glacier like a river?",["Both move downhill and carry rocks and sediment.","Both move very fast.","Both are made of sand.","Both are found only in deserts."],0,"Scientists call glaciers rivers of ice: they flow downhill and carry rock, just slower."),
+  sq(3,"Which statement about glaciers is NOT true?",["Glaciers move many miles each day.","Glaciers can carry huge boulders.","Glaciers can carve U-shaped valleys.","Glaciers leave piles of rock called moraines."],0,"Glaciers move very SLOWLY, so the first sentence is false."),
+  sq(3,"Put the steps in order. What happens to a boulder moved by a glacier?",["The ice picks it up → the glacier carries it → the ice melts and drops it","The ice melts → it picks up the boulder → it carries it","The glacier carries it → the ice picks it up → the boulder melts","The boulder melts → the ice drops it → the glacier picks it up"],0,"Pick up (erosion starts) → carry (erosion) → drop (deposition).",)]},
+ {id:"wind",name:"Wind",notes:["Wind can pick up and carry sand, soil and dust (erosion).","Stronger wind moves more and bigger pieces. Tiny dust travels the farthest.","Blowing sand hitting rock again and again wears it away (weathering).","When wind slows down, it drops sand in piles called *sand dunes* (deposition).","Grass, trees and fences slow the wind and protect soil. Deserts have few plants, so wind erosion is strong there."],qs:[
+  sq(1,"What forms when wind drops lots of sand in one place?",["a sand dune","a glacier","a moraine","a canyon"],0,"Wind drops sand in hills called dunes."),
+  sq(2,"In a lab, students blow a fan at a pile of sand. If they turn the fan to HIGH, what will most likely happen?",["More sand, and bigger grains, will blow away.","Less sand will move.","The sand will turn into rock.","Nothing will change."],0,"Stronger wind has more energy, so it moves more and bigger pieces."),
+  sq(2,"Which can wind carry the farthest?",["tiny bits of dust","big rocks","boulders","pebbles"],0,"The lightest pieces travel the farthest."),
+  sq(2,"Wind-blown sand hits a rock again and again until it wears away. This is an example of —",["weathering","deposition","melting","freezing"],0,"The rock is being broken down, so it is weathering."),
+  sq(2,"A farmer plants a row of trees along the edge of a field. Why?",["to slow the wind so less soil blows away","to make the wind stronger","to keep the sun off the road","to help glaciers form"],0,"A row of trees is a windbreak. It slows the wind and protects the soil."),
+  sq(3,"Which would NOT slow down wind erosion?",["removing all the plants from a field","planting grass","building a fence","planting a row of trees"],0,"Plants and fences block wind. Taking plants away would make erosion WORSE."),
+  sq(3,"Why do deserts often have more wind erosion than forests?",["Deserts have few plants to hold the dry soil.","Deserts have more trees.","Deserts never have wind.","Forests have more sand."],0,"Without roots to hold it, dry soil and sand blow away easily."),
+  sq(3,"In a lab, a fan blows on three piles of sand. Which pile will lose the LEAST sand?",["a pile with grass growing in it","a dry pile with nothing on it","a pile of extra-fine dust","a pile standing in the strongest wind"],0,"The grass roots hold the sand, so less blows away.")]}
+ ]};
+
+// Nonfiction passages like her class reading passages (written fresh, with NOT questions and a word-in-context question).
+STORIES.push(
+{id:"gates",lvl:2,title:"Bill Gates: Coder and Giver",genre:"Biography (nonfiction)",text:[
+ "Bill Gates was born in Seattle, Washington, in 1955. When he was a boy, computers were giant machines that filled whole rooms. They cost so much that only the government, big companies and a few colleges could buy one.",
+ "When Bill was in middle school, his school found a way to use a computer through a telephone line. Bill was hooked. He and an older friend, Paul Allen, spent hours writing programs, the instructions that tell a computer what to do.",
+ "In 1975, Bill and Paul read about a small new computer called the Altair. It had no program to make it useful. Bill boldly called the company and said he had one, even though he had not written it yet! The two friends worked day and night for weeks. When Paul showed the program to the company, it worked perfectly.",
+ "Bill left college to start a company with Paul. They named it Microsoft. Microsoft did not build computers. It made software, the programs that run on them. Its Windows operating system and programs like Word and Excel made computers easy enough for everyday people to use at home and at school.",
+ "Microsoft grew into one of the biggest companies in the world, and Bill became a billionaire while he was still in his early thirties. In 2000, he stepped back from running the company every day.",
+ "Bill and Melinda Gates started a foundation to give away much of their money. The foundation gives money to charities, groups that work to help people in need. One of its biggest goals is to help children around the world get vaccines that protect them from deadly diseases."
+],qs:[
+ {type:"mc",skill:"Main idea & details",q:"What is this passage MOSTLY about?",choices:["how Bill Gates helped make computers part of everyday life and then gave money to help others","how the Altair computer was built","why computers used to be so big","how to write a computer program"],a:0,why:"The passage covers his whole life: his programs, Microsoft, and his giving. The other answers are small details."},
+ {type:"mc",skill:"Context clues",para:6,q:"In paragraph 6, what does the word *charities* mean?",choices:["groups that work to help people in need","children's hospitals","new computer companies","colleges"],a:0,why:"The meaning comes right after the comma: *charities, groups that work to help people in need*. *Children* appears nearby, but that's a trap. Read the words right next to the new word."},
+ {type:"mc",skill:"Sequence",q:"Which of these happened FIRST?",choices:["Bill wrote a program for the Altair.","Bill became a billionaire.","Bill stepped back from running Microsoft.","Bill and Melinda started a foundation."],a:0,why:"Paragraph 3 (the Altair, 1975) comes before the billionaire years (paragraph 5), stepping back in 2000, and the foundation (paragraph 6)."},
+ {type:"mc",skill:"NOT questions",para:4,q:"Which of these did Microsoft NOT make?",choices:["the Altair computer","Windows","Word","Excel"],a:0,why:"Paragraph 4: Microsoft made Windows, Word and Excel. The Altair was made by another company. Bill and Paul only wrote its program."},
+ {type:"mc",skill:"Character",para:3,q:"Think about Bill's phone call about the Altair. You can tell that he was —",choices:["bold","shy","lazy","quiet"],a:0,why:"He said he had a program before he even wrote it! That takes courage: he was *bold* (the passage even says *boldly*)."},
+ {type:"mc",skill:"NOT questions",para:6,q:"Which sentence is NOT true about the Gates foundation?",choices:["It sells computers to schools.","It gives money to charities.","It helps children get vaccines.","It was started by Bill and Melinda Gates."],a:0,why:"Paragraph 6 says the other three. Nothing says it sells computers, so that one is NOT true."}
+]},
+{id:"glacier",lvl:2,title:"Rivers of Ice",genre:"Expository (science)",text:[
+ "A glacier is a huge, thick sheet of ice. Glaciers form in places where more snow falls in winter than melts in summer. Year after year, the snow piles up and presses down until the bottom layers turn into solid ice.",
+ "Glaciers may look still, but they move. Their great weight makes them slide slowly downhill, sometimes only a few inches a day. That is why scientists call glaciers \"rivers of ice.\"",
+ "As a glacier moves, it changes the land. Rocks frozen into the bottom of the ice scrape the ground like sandpaper, leaving long scratches in the rock below. The ice also pulls up boulders and carries them along. Breaking rock into smaller pieces is called weathering. Carrying the pieces away is called erosion.",
+ "When a glacier finally melts, it drops the rocks and soil it was carrying. This is called deposition. Long piles of rock left behind are called moraines. A giant boulder sitting all alone in a flat field may have ridden there on a glacier thousands of years ago.",
+ "Glaciers shaped California, too. Long ago, glaciers filled Yosemite Valley. As they moved, they scraped a narrow V-shaped river valley into a wide U shape with steep granite walls.",
+ "Today, glaciers cover about one-tenth of Earth's land, mostly near the poles and on tall mountains. Studying them helps scientists learn how Earth's surface has changed and how it keeps changing."
+],qs:[
+ {type:"mc",skill:"Main idea & details",q:"What is the main idea of this passage?",choices:["Glaciers are slow-moving ice that changes the shape of the land.","Yosemite is a beautiful place to visit.","Snow falls more in winter than in summer.","Boulders are very heavy."],a:0,why:"Every paragraph tells how glaciers form, move or change the land. The other answers are details or not the point."},
+ {type:"mc",skill:"Context clues",para:4,q:"In paragraph 4, what does *deposition* mean?",choices:["dropping rocks and soil in a new place","breaking rock into pieces","carrying rock away","freezing into ice"],a:0,why:"The sentence before says the glacier *drops the rocks and soil*. *This is called deposition.*"},
+ {type:"mc",skill:"Cause & effect",para:2,q:"What makes a glacier move?",choices:["Its great weight makes it slide downhill.","Strong winds push it.","Rivers carry it.","Animals walk on it."],a:0,why:"Paragraph 2: *Their great weight makes them slide slowly downhill.*"},
+ {type:"mc",skill:"NOT questions",q:"Which is NOT something the passage says glaciers do?",choices:["make valleys narrower and V-shaped","scratch the rock below them","carry boulders","leave piles of rock called moraines"],a:0,why:"Paragraph 5 says glaciers turned a V-shaped valley into a wide U shape. Narrower and V-shaped is the opposite, so it is NOT true."},
+ {type:"ab",skill:"Text evidence",a:{q:"Why might a giant boulder sit all alone in a flat field?",choices:["A glacier carried it there and dropped it.","Someone rolled it there.","It fell from the sky.","A river pushed it uphill."],a:0},b:{q:"Which sentence BEST supports your answer to Part A?",choices:["\"When a glacier finally melts, it drops the rocks and soil it was carrying.\"","\"Glaciers may look still, but they move.\"","\"Glaciers shaped California, too.\"","\"A glacier is a huge, thick sheet of ice.\""],a:0},why:"Paragraph 4 explains that melting glaciers drop what they carried, even giant boulders."},
+ {type:"mc",skill:"Author's purpose",para:5,q:"Why does the author include paragraph 5?",choices:["to show that glaciers changed a place in California","to explain how snow turns into ice","to tell how fast glaciers move","to describe where glaciers are today"],a:0,why:"Paragraph 5 gives a California example: Yosemite Valley."}
+]}
+);
 </script>
 <script>
 const $=id=>document.getElementById(id);
@@ -1293,7 +1560,7 @@ st.skill=st.skill||{};    // skill -> {r,t}
 st.miss=st.miss||{};      // question id -> right answers still needed to clear it
 st.seen=st.seen||{};      // question id -> times answered
 st.lv=st.lv||{};          // track -> {top: highest unlocked, cur: level she's playing, pass: passes at top}
-["read","gram","gl"].forEach(t=>{st.lv[t]=st.lv[t]||{top:1,cur:1,pass:0}});
+["read","gram","gl"].concat(Object.keys(SUBJ)).forEach(t=>{st.lv[t]=st.lv[t]||{top:1,cur:1,pass:0}});
 st.root=st.root||{};      // Greek & Latin root -> {r,t}
 st.weekly=st.weekly||{};  // week (Monday date) -> {read|gram|gl|mm: {right,total,at}}  first try only
 st.levelLog=st.levelLog||[]; // {at,track,lvl} each time a level unlocks
@@ -1322,7 +1589,8 @@ const LEVELS={
   {name:"Test day",desc:"12 questions from every unit, test mode.",need:.9,mix:{2:.6,3:1},n:12,test:true}
  ]
 };
-const TRACK_NAME={read:"Reading",gram:"Grammar",gl:"Greek & Latin"};
+Object.entries(SUBJ).forEach(([t,s])=>{LEVELS[t]=s.levels});
+const TRACK_NAME={read:"Reading",gram:"Grammar",gl:"Greek & Latin",math:"Math",ss:"Social Studies",sci:"Science"};
 const needCount=(L,total)=>Math.ceil(L.need*total-1e-9);
 
 const LETTERS="ABCDEFGH";
@@ -1336,13 +1604,17 @@ const ALL={};
 STORIES.forEach(s=>{s.lvl=s.lvl||1;s.qs.forEach((q,i)=>{q.id=s.id+"."+i;q.story=s.id;ALL[q.id]=q})});
 GRAMMAR.forEach(t=>t.qs.forEach((q,i)=>{q.id="g."+t.id+"."+i;q.skill=q.skill||t.name;q.topic=t.id;q.lvl=q.lvl||1;ALL[q.id]=q}));
 LESSONS.forEach(l=>l.try.forEach((q,i)=>{q.id="l."+l.id+"."+i;q.skill=l.skill;q.lesson=l.id;ALL[q.id]=q}));
+const SUBJ_SKILLS=new Set();
+Object.entries(SUBJ).forEach(([t,s])=>s.topics.forEach(tp=>{SUBJ_SKILLS.add(tp.name);
+  tp.qs.forEach((q,i)=>{q.id=t+"."+tp.id+"."+(q.key||i);q.mod=t;q.topic=tp.id;q.skill=q.skill||tp.name;ALL[q.id]=q})}));
+const subjQs=t=>SUBJ[t].topics.flatMap(tp=>tp.qs);
 const lessonBySkill=Object.fromEntries(LESSONS.map(l=>[l.skill,l]));
 const storyById=Object.fromEntries(STORIES.map(s=>[s.id,s]));
 const topicById=Object.fromEntries(GRAMMAR.map(t=>[t.id,t]));
 
 // ---------- Greek & Latin questions (built from GL_UNITS; rebuilt each round for fresh wrong answers) ----------
 // lvl 1: root -> meaning, meaning -> root. lvl 2: word meanings, which word has the root. lvl 3: words in sentences, choose two.
-const GL_SKILLS=["Root meanings","Word meanings","Words with a root","Words in sentences"];
+const GL_SKILLS=["Root meanings","Word meanings","Words with a root","Words in sentences","Spelling root words","Synonyms & antonyms","Analogies"];
 const GL_ROOTS=GL_UNITS.flatMap(u=>u.roots.map(x=>Object.assign(x,{unit:u.id,label:[x.r].concat(x.alt||[]).join(" / ")})));
 const GL_WORDS=GL_ROOTS.flatMap(x=>x.w.map(([w,m,s])=>({w,m,s,root:x})));
 const unitById=Object.fromEntries(GL_UNITS.map(u=>[u.id,u]));
@@ -1363,6 +1635,9 @@ function glBuild(){
     const mine=x.w.map(w=>w[0]),notMine=GL_WORDS.filter(w=>!has(w.w,x));
     add(x.r+".wr",2,"Words with a root",x,{type:"mc",q:"Which word has a root that means “"+x.m+"”?",choices:[mine[Math.random()*mine.length|0]].concat(wrong(notMine,x,()=>true).map(w=>w.w)),a:0,
       why:"Look for *"+x.label+"* (“"+x.m+"”) inside the word: "+mine.map(w=>"*"+w+"*").join(", ")+"."});
+    if(mine.length>=3){const odd=wrong(notMine,x,()=>true)[0];
+      if(odd)add(x.r+".not",3,"NOT questions",x,{type:"mc",q:"Which word does NOT have a root that means “"+x.m+"”?",choices:[odd.w].concat(shuffle(mine).slice(0,3)),a:0,
+        why:"*"+x.label+"* means “"+x.m+".” It is in "+mine.map(w=>"*"+w+"*").join(", ")+". *"+odd.w+"* doesn't have it, so it is the answer."})}
     if(mine.length>=2){const two=shuffle(mine).slice(0,2);
       add(x.r+".two",3,"Words with a root",x,{type:"multi",q:"Which TWO words have a root that means “"+x.m+"”?",choices:two.concat(wrong(notMine,x,()=>true).slice(0,2).map(w=>w.w)),a:[0,1],
         why:"*"+two[0]+"* and *"+two[1]+"* both have *"+x.label+"*, which means “"+x.m+".”"})}
@@ -1375,6 +1650,7 @@ function glBuild(){
     if(w.s)add(x.r+"."+w.w+".ws",3,"Words in sentences",x,{type:"mc",q:"Which word best completes the sentence?",sent:w.s.replace("___","_____"),choices:[w.w].concat(wrong(notMine,x,()=>true).map(v=>v.w)),a:0,
       why:"*"+w.w+"* means "+w.m+": “"+w.s.replace("___",w.w)+"”"});
   });
+  GL_UNITS.forEach(u=>(u.extra||[]).forEach((e,i)=>{const q=Object.assign({id:"gl."+u.id+".x"+i,mod:"gl",unit:u.id,type:"mc"},e);qs.push(q);ALL[q.id]=q}));
   GL_QS=qs;
 }
 glBuild();
@@ -1390,11 +1666,14 @@ const gradeTone=p=>p>=90?"hi":p>=70?"mid":"lo";
 const WEEKLY=[
  {t:"read",name:"Reading test",desc:"2 stories, 12 questions, like the Wonders test"},
  {t:"gram",name:"Grammar test",desc:"12 questions from every topic"},
- {t:"gl",name:"Greek & Latin quiz",desc:"10 questions from every unit"},
- {t:"mm",name:"Mad Minute",desc:"30 facts in 1 minute, like the paper test"}
+ {t:"gl",name:"Greek & Latin quiz",desc:"10 questions, mostly her newest class unit"},
+ {t:"mm",name:"Mad Minute",desc:"30 facts in 1 minute, like the paper test"},
+ {t:"math",name:"Math test",desc:"10 questions: estimate, area model, 2-digit × 2-digit",n:10},
+ {t:"ss",name:"Social Studies test",desc:"12 questions: California's Native Peoples",n:12},
+ {t:"sci",name:"Science quiz",desc:"10 questions: glaciers, wind and erosion",n:10}
 ];
 
-const VIEWS=["home","reading","greek","roots","report","mm","learn","lesson","quiz","done"];
+const VIEWS=["home","reading","greek","roots","report","subj","notes","mm","learn","lesson","quiz","done"];
 function show(id){VIEWS.forEach(x=>$(x).hidden=x!==id);window.scrollTo(0,0)}
 
 // ---------- cheers: sounds, voice, animations ----------
@@ -1612,11 +1891,16 @@ function startWeekly(t){
   let items,name,ids;
   if(t==="read"){const picked=leastRead(storiesFor([1,2,3].filter(n=>n<=Math.min(3,top))),2);items=picked.flatMap(s=>s.qs);ids=picked.map(s=>s.id);name="Weekly reading test"}
   else if(t==="gram"){items=shuffle(pickWeighted(GRAMMAR.flatMap(x=>x.qs).filter(q=>q.lvl<=Math.min(3,top)),12));name="Weekly grammar test"}
-  else{glBuild();items=shuffle(pickWeighted(GL_QS.filter(q=>q.lvl<=Math.min(3,top)),10));name="Weekly Greek & Latin quiz"}
-  S={kind:"weekly",weekly:true,track:t,mod:t==="gl"?"gl":"rc",counts:false,name,ids,items,i:0,right:0,wrong:[],hl:false,test:true,back:"home"};
+  else if(t==="gl"){glBuild();
+    // like school: mostly the newest class unit, plus a few review questions
+    const cls=GL_UNITS.filter(u=>!u.starter),cur=cls.length?cls[cls.length-1].id:null;
+    const mine=GL_QS.filter(q=>q.unit===cur),rest=GL_QS.filter(q=>q.unit!==cur&&q.lvl<=Math.min(3,top));
+    items=shuffle(pickWeighted(mine,cur?7:0).concat(pickWeighted(rest,cur?3:10)));name="Weekly Greek & Latin quiz"}
+  else{const W=WEEKLY.find(x=>x.t===t);items=shuffle(pickWeighted(subjQs(t),W.n,q=>q.lvl===3?1.3:1));name="Weekly "+SUBJ[t].name.toLowerCase()+" test"}
+  S={kind:"weekly",weekly:true,track:t,mod:t==="read"||t==="gram"?"rc":t,counts:false,name,ids,items,i:0,right:0,wrong:[],hl:false,test:true,back:"home"};
   begin();
 }
-function begin(){if(!S.back)S.back=S.mod==="gl"?"greek":"reading";streak=0;showStreak();$("confetti").textContent="";$("cheer").textContent="";show("quiz");renderQ()}
+function begin(){if(SUBJ[S.mod])CUR=S.mod;if(!S.back)S.back=S.mod==="gl"?"greek":S.mod==="rc"?"reading":"subj";streak=0;showStreak();$("confetti").textContent="";$("cheer").textContent="";show("quiz");renderQ()}
 
 // ---------- passage ----------
 function storyHTML(s,hl){
@@ -1681,14 +1965,24 @@ function renderQ(){
     if(q.sent){const p=document.createElement("p");p.className="sent";p.innerHTML=fmt(q.sent);c.appendChild(p)}
     if(q.type==="multi")chooseN(c,q.a.length);
     choiceList(c,q,"x");
+    if(isNeg(q))negGate(c,q);
   }
   if(S.test&&S.i===0){const n=document.createElement("p");n.className="testnote";n.style.marginTop="12px";n.textContent="Test mode: like the real test, you'll see which answers were right at the end.";c.appendChild(n)}
   renderPassage();
 }
-function addText(el,t){const p=document.createElement("p");p.className="qtext";p.innerHTML=fmt(t);el.appendChild(p)}
+function addText(el,t){const p=document.createElement("p");p.className="qtext";p.innerHTML=fmt(t).replace(/\b(NOT|EXCEPT)\b/g,"<mark class='neg'>$1</mark>");el.appendChild(p)}
+const isNeg=q=>(q.type==="mc"||q.type==="multi")&&/\b(NOT|EXCEPT)\b/.test(q.q);
+// she misses NOT questions by rushing: the choices open only after she taps to say she saw the word
+function negGate(c,q){
+  const w=q.q.match(/\b(NOT|EXCEPT)\b/)[1],box=c.querySelector(".choices");box.classList.add("locked");
+  const b=document.createElement("button");b.className="negok";b.setAttribute("aria-pressed","false");
+  b.textContent="👀 I see "+w+". I'm looking for the one that is "+(w==="NOT"?"NOT true (the odd one out).":"the exception.");
+  b.onclick=()=>{b.setAttribute("aria-pressed","true");b.textContent="✓ "+w+" question: check each answer, find the odd one out.";box.classList.remove("locked")};
+  box.before(b);
+}
 function toggle(cur,ci,btn){const on=btn.getAttribute("aria-pressed")!=="true";btn.setAttribute("aria-pressed",on);return on?[...cur,ci]:cur.filter(x=>x!==ci)}
 function pick(part,ci,btn,box){
-  if(checked)return;
+  if(checked||box.classList.contains("locked"))return;
   const q=S.items[S.i];
   if(q.type==="multi"){sel=toggle(sel,ci,btn);$("check").disabled=sel.length!==q.a.length;return}
   if(q.type==="ab"){
@@ -1748,6 +2042,7 @@ function record(q,ok){
   st.seen[q.id]=(st.seen[q.id]||0)+1;
   const k=st.skill[q.skill]||{r:0,t:0};k.t++;if(ok)k.r++;st.skill[q.skill]=k;
   if(q.root){const r=st.root[q.root]||{r:0,t:0};r.t++;if(ok)r.r++;st.root[q.root]=r}
+  if(isNeg(q)&&q.skill!=="NOT questions"){const k=st.skill["NOT questions"]||{r:0,t:0};k.t++;if(ok)k.r++;st.skill["NOT questions"]=k}
   if(ok){if(st.miss[q.id]){st.miss[q.id]-=1;if(st.miss[q.id]<=0)delete st.miss[q.id]}}
   else st.miss[q.id]=2; // needs two right answers to leave the list
   save();
@@ -1774,7 +2069,7 @@ function finish(){
   $("score").textContent=S.right+"/"+S.items.length;
   const pct=Math.round(S.right/S.items.length*100);
   $("verdict").textContent=pct===100?"Perfect!":pct>=90?"That's an A!":pct>=80?"Solid B! Almost there.":pct>=70?"Good try! Read the tips below.":"Let's practice this more.";
-  $("detail").textContent=pct+"% · "+S.name+(S.lvl&&S.kind!=="grammar"&&S.kind!=="greek"?" · "+TRACK_NAME[S.track]+" level "+S.lvl:"");
+  $("detail").textContent=pct+"% · "+S.name+(S.lvl&&!["grammar","greek","subj"].includes(S.kind)?" · "+TRACK_NAME[S.track]+" level "+S.lvl:"");
   // level banner
   const lu=$("levelup");lu.hidden=true;
   if(lvMsg){
@@ -1803,6 +2098,7 @@ function finish(){
   const tl=$("tipLearn"),ls=top&&lessonBySkill[top[0]];
   tl.hidden=!ls||S.kind==="try";if(ls){tl.textContent="📚 Learn: "+ls.skill;tl.onclick=()=>openLesson(ls.id)}
   if(S.mod==="gl"&&S.wrong.length){tl.hidden=false;tl.textContent="📚 Study the roots";tl.onclick=openRoots}
+  if(SUBJ[S.mod]&&S.wrong.length){const m=S.mod;tl.hidden=false;tl.textContent="📚 Study notes";tl.onclick=()=>openNotes(m)}
   $("again").textContent=S.kind==="try"?"Practice more":S.weekly?"Practice "+TRACK_NAME[S.track]:"Another one";
   $("home2").textContent=S.lesson?"Back to lesson":S.back==="home"?"Home":"Back";
   const rv=$("rev");rv.textContent="";
@@ -1824,7 +2120,9 @@ $("again").onclick=()=>{
   else if(S.kind==="topic")startTopic(S.topic,S.lesson);
   else if(S.kind==="greek")startGreek(st.lv.gl.cur);
   else if(S.kind==="unit")startUnit(S.unit);
-  else if(S.kind==="weekly"){if(S.track==="read")startReading(st.lv.read.cur);else if(S.track==="gram")startGrammar(st.lv.gram.cur);else startGreek(st.lv.gl.cur)}
+  else if(S.kind==="subj")startSubj(S.track,st.lv[S.track].cur);
+  else if(S.kind==="stopic")startSubjTopic(S.track,S.topic);
+  else if(S.kind==="weekly"){if(SUBJ[S.track])startSubj(S.track,st.lv[S.track].cur);else if(S.track==="read")startReading(st.lv.read.cur);else if(S.track==="gram")startGrammar(st.lv.gram.cur);else startGreek(st.lv.gl.cur)}
   else if(missIds(S.mod).length)startMisses(S.mod);else go(S.back);
 };
 const leave=()=>{if(S&&S.lesson)openLesson(S.lesson);else go(S?S.back:"home")};
@@ -1833,8 +2131,8 @@ $("quit").onclick=leave;
 window.goBack=()=>{
   if(!$("home").hidden)return"exit";
   if(!$("mm").hidden){mmBack();return"nav"}
-  if(!$("lesson").hidden)openLearn();else if(!$("learn").hidden)go("reading");else if(!$("roots").hidden)go("greek");
-  else if(!$("reading").hidden||!$("greek").hidden||!$("report").hidden)go("home");else leave();
+  if(!$("lesson").hidden)openLearn();else if(!$("learn").hidden)go("reading");else if(!$("roots").hidden)go("greek");else if(!$("notes").hidden)go("subj");
+  else if(!$("reading").hidden||!$("greek").hidden||!$("report").hidden||!$("subj").hidden)go("home");else leave();
   return"nav";
 };
 
@@ -1913,11 +2211,11 @@ function histRows(box,runs,empty){
   box.textContent="";
   if(!runs.length){const p=document.createElement("p");p.className="muted";p.textContent=empty;box.appendChild(p)}
   runs.forEach(x=>{const d=document.createElement("div");const dt=new Date(x.at);
-    d.innerHTML="<span>"+dt.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" · "+esc(x.name)+(x.lvl&&x.kind!=="grammar"&&x.kind!=="greek"&&!x.weekly?" · L"+x.lvl:"")+"</span><b>"+x.right+"/"+x.total+"</b>";box.appendChild(d)});
+    d.innerHTML="<span>"+dt.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" · "+esc(x.name)+(x.lvl&&!["grammar","greek","subj"].includes(x.kind)&&!x.weekly?" · L"+x.lvl:"")+"</span><b>"+x.right+"/"+x.total+"</b>";box.appendChild(d)});
 }
-function renderAll(){renderHome();renderGreek();renderHub()}
+function renderAll(){renderHome();renderGreek();renderHub();if(CUR)renderSubj()}
 function go(v){
-  if(v==="greek")renderGreek();else if(v==="home")renderHub();else if(v==="report")renderReport();else if(v==="reading")renderHome();
+  if(v==="greek")renderGreek();else if(v==="subj")renderSubj();else if(v==="home")renderHub();else if(v==="report")renderReport();else if(v==="reading")renderHome();
   show(v||"home");
 }
 function renderHome(){
@@ -1943,7 +2241,7 @@ function renderHome(){
     b.disabled=locked;if(locked)b.style.opacity=.5;
     b.onclick=()=>startStory(s);sp.appendChild(b)});
   const sk=$("skills");sk.textContent="";
-  const rows=Object.entries(st.skill).filter(([n,v])=>v.t>=2&&!GL_SKILLS.includes(n)).sort((a,b)=>a[1].r/a[1].t-b[1].r/b[1].t);
+  const rows=Object.entries(st.skill).filter(([n,v])=>v.t>=2&&!GL_SKILLS.includes(n)&&!SUBJ_SKILLS.has(n)).sort((a,b)=>a[1].r/a[1].t-b[1].r/b[1].t);
   if(!rows.length){const p=document.createElement("p");p.className="muted";p.textContent="School scores so far: Wonders U1 comprehension test 70%, U1 W4 grammar test 60%. Your practice shows up here, weakest skill first.";sk.appendChild(p)}
   rows.slice(0,8).forEach(([name,v])=>{const pct=Math.round(v.r/v.t*100);const row=document.createElement("div");row.className="sk";
     row.innerHTML="<span>"+esc(name)+"</span><div class='bar'><i class='"+(pct<70?"lo":pct<85?"mid":"")+"' style='width:"+pct+"%'></i></div><b>"+pct+"%</b>";sk.appendChild(row)});
@@ -2024,12 +2322,58 @@ function mmBack(){
   if(!d.getElementById("run").hidden)d.getElementById("quit").click();else d.getElementById("home2").click();
 }
 
+// ---------- Math, Social Studies, Science: same rules as grammar levels ----------
+let CUR=null;
+function startSubj(t,lvl){
+  const L=LEVELS[t][lvl-1],pool=subjQs(t).filter(q=>L.mix[q.lvl]);
+  S={kind:"subj",track:t,mod:t,lvl,counts:true,name:SUBJ[t].name+" level "+lvl,items:shuffle(pickWeighted(pool,L.n,q=>L.mix[q.lvl])),i:0,right:0,wrong:[],test:L.test};
+  begin();
+}
+function startSubjTopic(t,tid){
+  // one topic at her current level and below; practice only
+  const lvl=st.lv[t].cur,tp=SUBJ[t].topics.find(x=>x.id===tid);
+  let pool=tp.qs.filter(q=>q.lvl<=lvl);if(pool.length<8)pool=tp.qs.filter(q=>q.lvl<=Math.max(lvl,2));if(pool.length<8)pool=tp.qs;
+  S={kind:"stopic",track:t,mod:t,lvl,counts:false,name:tp.name,topic:tid,items:shuffle(pickWeighted(pool,10,q=>q.lvl===lvl?2:1)),i:0,right:0,wrong:[],test:false};
+  begin();
+}
+function openSubj(t){CUR=t;$("confetti").textContent="";$("cheer").textContent="";go("subj")}
+function renderSubj(){
+  const t=CUR,s=SUBJ[t],lv=st.lv[t];
+  $("sjHead").textContent=s.icon+" "+s.name;$("sjIntro").textContent=s.intro;$("sjIcon").textContent=s.icon;
+  $("sjTitle").textContent=s.name+" · Level "+lv.cur+" "+LEVELS[t][lv.cur-1].name;
+  $("sjLvSub").textContent=levelLine(t);
+  const nm=missIds(t).length;
+  $("sjMissSub").textContent=nm?nm+" question"+(nm>1?"s":"")+" to fix":"Nothing to fix yet. Questions you miss come back here";
+  $("sjMiss").disabled=!nm;$("sjMiss").style.opacity=nm?1:.55;
+  ladders($("sjLadders"),[t]);
+  const tp=$("sjTopics");tp.textContent="";
+  s.topics.forEach(x=>{const b=document.createElement("button");b.innerHTML=esc(x.name);const a=acc(x.name,null);if(a!==null)b.innerHTML+="<span class='pct'>"+Math.round(a*100)+"%</span>";b.onclick=()=>startSubjTopic(t,x.id);tp.appendChild(b)});
+  histRows($("sjHist"),st.runs.filter(r=>r.mod===t).slice(-8).reverse(),"Read the study notes, then start with level 1. Your scores are saved on this phone.");
+}
+function openNotes(t){
+  CUR=t;const s=SUBJ[t],box=$("notesList");box.textContent="";
+  $("notesHead").textContent="📚 "+s.name+" notes";
+  s.topics.forEach(x=>{const sec=document.createElement("div");sec.className="unit";
+    const hd=document.createElement("div");hd.className="uh";hd.innerHTML="<p class='label' style='margin:0'>"+esc(x.name)+"</p>";
+    const b=document.createElement("button");b.className="small";b.textContent="Practice";b.onclick=()=>startSubjTopic(t,x.id);hd.appendChild(b);sec.appendChild(hd);
+    const c=document.createElement("div");c.className="rcard";c.innerHTML="<ul>"+x.notes.map(n=>"<li>"+fmt(n)+"</li>").join("")+"</ul>";sec.appendChild(c);
+    box.appendChild(sec)});
+  show("notes");
+}
+$("sjQuiz").onclick=()=>startSubj(CUR,st.lv[CUR].cur);
+$("sjStudy").onclick=()=>openNotes(CUR);
+$("sjMiss").onclick=()=>startMisses(CUR);
+$("sjBack").onclick=()=>go("home");
+$("notesBack").onclick=()=>go("subj");
+Object.keys(SUBJ).forEach(t=>{$("go_"+t).onclick=()=>openSubj(t)});
+
 // ---------- hub ----------
 function renderHub(){
   const r=st.lv.read,g=st.lv.gram,l=st.lv.gl;
   $("rcSub").textContent="Reading L"+r.cur+" "+LEVELS.read[r.cur-1].name+" · Grammar L"+g.cur+" "+LEVELS.gram[g.cur-1].name;
   $("glSub").textContent="Level "+l.cur+" "+LEVELS.gl[l.cur-1].name+" · "+GL_ROOTS.length+" roots";
   const mr=mmRuns().filter(x=>x.kind!=="big").sort((a,b)=>a.at-b.at).pop();
+  Object.keys(SUBJ).forEach(t=>{const lv=st.lv[t];$("sub_"+t).textContent="Level "+lv.cur+" "+LEVELS[t][lv.cur-1].name+" · "+SUBJ[t].intro.split(":")[0]});
   $("mmSub").textContent=mr?"Last try: "+mr.score+"/"+(mr.total||30):"30 multiplication facts. Beat the clock";
   const k=wkKey(Date.now()),w=st.weekly[k]||{};
   const wed=new Date(wkDate(k));wed.setDate(wed.getDate()+2);
@@ -2071,7 +2415,7 @@ function renderReport(){
   t+=row("Week grade",k=>{const w=st.weekly[k]||{},d=WEEKLY.filter(x=>w[x.t]);if(!d.length)return cell("—");
     return gcell({right:d.reduce((s,x)=>s+w[x.t].right/w[x.t].total,0),total:d.length})},"tot");
   t+="<tr class='sep'><td colspan='"+(weeks.length+1)+"'>Practice (not counting tests)</td></tr>";
-  [["read","Reading"],["gram","Grammar"],["gl","Greek & Latin"]].forEach(([tr,nm])=>{
+  [["read","Reading"],["gram","Grammar"],["gl","Greek & Latin"],["math","Math"],["ss","Social Studies"],["sci","Science"]].forEach(([tr,nm])=>{
     t+=row(nm+" practice",k=>{const rs=inWk(st.runs,k).filter(r=>!r.weekly&&trackOf(r)===tr);if(!rs.length)return cell("—");
       const a=rs.reduce((s,r)=>s+r.right,0),b=rs.reduce((s,r)=>s+r.total,0);return cell(Math.round(a/b*100)+"% <small>· "+rs.length+" round"+(rs.length>1?"s":"")+"</small>")})});
   t+=row("Mad Minute best",k=>{const rs=inWk(mm,k).filter(r=>r.kind!=="big"&&!r.weekly&&r.secs===60);if(!rs.length)return cell("—");return cell(Math.max(...rs.map(r=>r.score))+"/30 <small>· "+rs.length+" tr"+(rs.length>1?"ies":"y")+"</small>")});

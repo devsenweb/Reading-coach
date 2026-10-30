@@ -29,3 +29,15 @@ check if it's easy, but never hold a push or ask the owner first; just ship it a
   `tools/make_voice.py` (Kokoro TTS, voice `af_heart`). The owner disliked the robotic phone voice,
   so whenever you add or change a spoken line (anything passed to `say()`), rerun that script and
   commit the clips. Lines without a clip fall back to the phone's text-to-speech (`VOICE` settings).
+
+## Adding school content each week
+
+- Greek & Latin: add the class unit to `GL_UNITS` (newest last, `extra` for hand-written questions
+  like spelling, analogies and NOT questions). Each root lives in only one unit (ids come from the
+  root). The weekly quiz draws mostly from the newest unit that isn't a starter.
+- Math, Social Studies, Science: `SUBJ.math / SUBJ.ss / SUBJ.sci`, each with 4 levels and topics
+  (`notes` for the Study notes screen, `qs`). Math questions are generated from a fixed seed so ids
+  stay stable; don't change the seed or the order of generation.
+- Write NOT / EXCEPT in capitals: those questions get a red mark and she must tap to confirm she
+  saw the word before the choices open (she loses points on NOT questions by rushing).
+- Write questions and passages in your own words; don't copy publisher passages.
