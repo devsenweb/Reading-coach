@@ -1365,6 +1365,42 @@ extra:[
 );
 // take the Unit 9 roots out of the starter units
 GL_UNITS.forEach(u=>{if(u.id.startsWith("s")){u.starter=true;u.roots=u.roots.filter(x=>!["photo","graph","bio"].includes(x.r))}});
+// Unit 10 (test Fri 10/30). From memory: Ivana recalled plural, pluralism, polytheism, megalosaurus and multitude on 10/29.
+// The other words are common words on the same roots, added as extra practice. Replace with the class card list when it comes home.
+GL_UNITS.push(
+{id:"u10",name:"Unit 10 (class, from memory): plur, multi, poly, mega",roots:[
+ {r:"plur",o:"Latin",m:"more",kin:["multi","poly"],w:[
+  ["plural","more than one","*Cats* is the ___ of *cat*."],
+  ["pluralism","many different groups, beliefs or ideas living side by side","Our city's ___ means people of many cultures and religions live together."]]},
+ {r:"multi",o:"Latin",m:"many",w:[
+  ["multitude","a very large number of people or things","A ___ of fans filled the stadium."],
+  ["multiply","to make many more; to add equal groups again and again","If you ___ 3 by 4, you get 12."],
+  ["multicolored","having many colors","She painted a ___ rainbow on the wall."]]},
+ {r:"poly",o:"Greek",m:"many",w:[
+  ["polytheism","the belief in many gods","The ancient Greeks practiced ___: they worshipped Zeus, Athena and many other gods."],
+  ["polygon","a flat shape with many straight sides","A triangle, a square and a hexagon are each a ___."]]},
+ {r:"mega",alt:["megalo"],o:"Greek",m:"big, great",w:[
+  ["megalosaurus","a huge meat-eating dinosaur (its name means “great lizard”)","The ___ was one of the first dinosaurs ever named."],
+  ["megaphone","a cone that makes your voice sound big and loud","The coach yelled through a ___ so everyone could hear."]]}
+],
+extra:[
+ {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["polytheism","politheism","polythiesm","polytheisum"],a:0,why:"*poly* (many) + *the* (god) + *ism* (belief) = *polytheism*. Spell it one part at a time: p-o-l-y + t-h-e + i-s-m."},
+ {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["megalosaurus","megalasaurus","megalosorus","megolosaurus"],a:0,why:"*megalo* (great) + *saurus* (lizard): m-e-g-a-l-o + s-a-u-r-u-s."},
+ {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["multitude","multatude","multitood","multitud"],a:0,why:"*multi* (many) + *tude*: m-u-l-t-i + t-u-d-e."},
+ {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["pluralism","plurilism","plurelism","pluralisum"],a:0,why:"Start with *plural*, then add *ism*: p-l-u-r-a-l + i-s-m."},
+ {lvl:2,skill:"Synonyms & antonyms",q:"Choose a SYNONYM (same meaning) for *multitude*.",choices:["crowd","one","silence","shape"],a:0,why:"*multi* means many. A *multitude* is a huge number of people, like a *crowd*."},
+ {lvl:2,skill:"Synonyms & antonyms",q:"Choose an ANTONYM (opposite) for *plural*.",choices:["singular","many","several","double"],a:0,why:"*Plural* means more than one. *Singular* means just one, so it is the opposite."},
+ {lvl:3,skill:"Synonyms & antonyms",q:"*Polytheism* is the belief in many gods. What is the belief in only ONE god called?",choices:["monotheism","multitheism","megatheism","pluralism"],a:0,why:"*mono* means one, so *monotheism* is belief in one god. *poly* (many) and *mono* (one) are opposites."},
+ {lvl:2,skill:"Analogies",q:"Complete the analogy: poly : many :: mega : ___",choices:["big","small","one","more"],a:0,why:"Each root goes with its meaning. *poly* means many, and *mega* means big or great."},
+ {lvl:3,skill:"Analogies",q:"Complete the analogy: megaphone : loud :: microphone : ___",choices:["small sound picked up","big","many","bright"],a:0,why:"*mega* (big) makes a megaphone loud. *micro* (small) is in *microphone*, which picks up small sounds. Match the roots."},
+ {lvl:3,skill:"Analogies",q:"Complete the analogy: plural : singular :: multitude : ___",choices:["one","crowd","many","group"],a:0,why:"*Plural* is the opposite of *singular*. The opposite of a *multitude* (a huge number) is *one*."},
+ {lvl:3,skill:"NOT questions",q:"Which word does NOT have a root that means “many” or “more”?",choices:["megaphone","polygon","multitude","plural"],a:0,why:"*poly* and *multi* mean many, and *plur* means more. *megaphone* has *mega*, which means big, NOT many."},
+ {lvl:3,skill:"NOT questions",q:"Which is NOT a *polygon*?",choices:["a circle","a triangle","a square","a hexagon"],a:0,why:"A polygon has many STRAIGHT sides. A circle has no straight sides, so it is NOT a polygon."},
+ {lvl:3,skill:"NOT questions",q:"Which statement is NOT true about the *megalosaurus*?",choices:["It was a tiny dinosaur.","Its name means “great lizard.”","It was a meat eater.","It was one of the first dinosaurs ever named."],a:0,why:"*mega* / *megalo* means big or great, so it was NOT tiny. The other three are true."},
+ {lvl:3,skill:"NOT questions",q:"Which word is NOT plural?",choices:["child","children","geese","dinosaurs"],a:0,why:"*Plural* means more than one. *Child* is just one, so it is NOT plural. *Children*, *geese* and *dinosaurs* all mean more than one."},
+ {lvl:2,skill:"Words in sentences",q:"Ancient Egyptians believed in Ra, Isis, Osiris and many other gods. This belief is called ___.",choices:["polytheism","pluralism","multitude","polygon"],a:0,why:"*poly* (many) + *the* (god): belief in many gods is *polytheism*."}
+]}
+);
 Object.assign(TIPS,{
  "Spelling root words":["Spell a root word one root at a time: *biblio* + *phile*, *photo* + *synthesis*.","Greek roots spell the *f* sound with *ph*: *photo*, *phil*, *graph*."],
  "Synonyms & antonyms":["*Synonym* = same meaning. *Antonym* = opposite meaning. Circle which one the question asks for.","Use the root: *bio* (life) + *degradable* (break down). The opposite can't break down at all."],
@@ -1657,13 +1693,16 @@ function glBuild(){
   const qs=[];
   const add=(id,lvl,skill,x,o)=>{const q=Object.assign({id:"gl."+id,lvl,skill,mod:"gl",root:x.r,unit:x.unit},o);qs.push(q);ALL[q.id]=q};
   const ex=x=>"*"+x.w[0][0]+"*: "+x.w[0][1]+".";
+  // roots with the same or a close meaning (poly and multi both mean many; plur means more) never trap each other
+  const uniqM=l=>{const seen=new Set();return l.filter(y=>!seen.has(y.m)&&seen.add(y.m))};
+  const rel=(x,y)=>y.m===x.m||(x.kin||[]).includes(y.r)||(y.kin||[]).includes(x.r);
   GL_ROOTS.forEach(x=>{
-    const others=GL_ROOTS.filter(y=>y!==x&&y.m!==x.m);
-    add(x.r+".m",1,"Root meanings",x,{type:"mc",q:"What does the "+x.o+" root *"+x.label+"* mean?",choices:[x.m].concat(wrong(others,x,()=>true).map(y=>y.m)),a:0,
+    const others=GL_ROOTS.filter(y=>y!==x&&!rel(x,y));
+    add(x.r+".m",1,"Root meanings",x,{type:"mc",q:"What does the "+x.o+" root *"+x.label+"* mean?",choices:[x.m].concat(wrong(uniqM(shuffle(others)),x,()=>true).map(y=>y.m)),a:0,
       why:"*"+x.label+"* means “"+x.m+".” Example: "+ex(x)});
     add(x.r+".r",1,"Root meanings",x,{type:"mc",q:"Which root means “"+x.m+"”?",choices:[x.label].concat(wrong(others,x,()=>true).map(y=>y.label)),a:0,
       why:"*"+x.label+"* is a "+x.o+" root that means “"+x.m+".” Example: "+ex(x)});
-    const mine=x.w.map(w=>w[0]),notMine=GL_WORDS.filter(w=>!has(w.w,x));
+    const mine=x.w.map(w=>w[0]),notMine=GL_WORDS.filter(w=>!has(w.w,x)&&!rel(x,w.root));
     add(x.r+".wr",2,"Words with a root",x,{type:"mc",q:"Which word has a root that means “"+x.m+"”?",choices:[mine[Math.random()*mine.length|0]].concat(wrong(notMine,x,()=>true).map(w=>w.w)),a:0,
       why:"Look for *"+x.label+"* (“"+x.m+"”) inside the word: "+mine.map(w=>"*"+w+"*").join(", ")+"."});
     if(mine.length>=3){const odd=wrong(notMine,x,()=>true)[0];
@@ -1673,7 +1712,7 @@ function glBuild(){
       add(x.r+".two",3,"Words with a root",x,{type:"multi",q:"Which TWO words have a root that means “"+x.m+"”?",choices:two.concat(wrong(notMine,x,()=>true).slice(0,2).map(w=>w.w)),a:[0,1],
         why:"*"+two[0]+"* and *"+two[1]+"* both have *"+x.label+"*, which means “"+x.m+".”"})}
   });
-  GL_WORDS.forEach(w=>{const x=w.root,notMine=GL_WORDS.filter(v=>!has(v.w,x));
+  GL_WORDS.forEach(w=>{const x=w.root,notMine=GL_WORDS.filter(v=>!has(v.w,x)&&!rel(x,v.root));
     add(x.r+"."+w.w+".wd",2,"Word meanings",x,{type:"mc",q:"What does *"+w.w+"* mean?",choices:[w.m].concat(wrong(notMine,x,()=>true).map(v=>v.m)),a:0,
       why:"*"+x.label+"* means “"+x.m+",” so *"+w.w+"* means "+w.m+"."});
     add(x.r+"."+w.w+".wm",2,"Word meanings",x,{type:"mc",q:"Which word means “"+w.m+"”?",choices:[w.w].concat(wrong(notMine,x,()=>true).map(v=>v.w)),a:0,
