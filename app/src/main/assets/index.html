@@ -193,6 +193,8 @@ mark.b{background:rgba(242,183,5,.28);background:color-mix(in srgb,var(--pencil)
 .rcard{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:12px;margin:0 0 8px}
 .rcard .rt{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .rcard .rt b{font-size:1.2rem}
+.unote{font-size:.9rem;color:var(--muted,#666);margin:-4px 0 8px}
+.rcard li.extra{opacity:.75}
 .rcard .rt .o{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
 .rcard .rt .m{background:var(--green-bg);padding:0 .35em;border-radius:4px;font-weight:600}
 .rcard ul{margin:6px 0 0;padding-left:1.1em;font-size:.9rem;line-height:1.45}
@@ -1365,23 +1367,25 @@ extra:[
 );
 // take the Unit 9 roots out of the starter units
 GL_UNITS.forEach(u=>{if(u.id.startsWith("s")){u.starter=true;u.roots=u.roots.filter(x=>!["photo","graph","bio"].includes(x.r))}});
-// Unit 10 (test Fri 10/30). From memory: Ivana recalled plural, pluralism, polytheism, megalosaurus and multitude on 10/29.
+// Unit 10 (test Fri 10/30). From memory: Ivana recalled plural, pluralism, polytheism, megalosaurus, multitude, megalopolis and multidisciplinary on 10/29 (tag "her"). Tag "extra" = practice word, not from her cards.
 // The other words are common words on the same roots, added as extra practice. Replace with the class card list when it comes home.
 GL_UNITS.push(
-{id:"u10",name:"Unit 10 (class, from memory): plur, multi, poly, mega",roots:[
+{id:"u10",name:"Unit 10 (class, from memory): plur, multi, poly, mega",note:"⭐ = a word Ivana remembered from her Unit 10 cards. The others are extra practice words on the same roots, not from her card list.",roots:[
  {r:"plur",o:"Latin",m:"more",kin:["multi","poly"],w:[
-  ["plural","more than one","*Cats* is the ___ of *cat*."],
-  ["pluralism","many different groups, beliefs or ideas living side by side","Our city's ___ means people of many cultures and religions live together."]]},
+  ["plural","more than one","*Cats* is the ___ of *cat*.","her"],
+  ["pluralism","many different groups, beliefs or ideas living side by side","Our city's ___ means people of many cultures and religions live together.","her"]]},
  {r:"multi",o:"Latin",m:"many",w:[
-  ["multitude","a very large number of people or things","A ___ of fans filled the stadium."],
-  ["multiply","to make many more; to add equal groups again and again","If you ___ 3 by 4, you get 12."],
-  ["multicolored","having many colors","She painted a ___ rainbow on the wall."]]},
+  ["multitude","a very large number of people or things","A ___ of fans filled the stadium.","her"],
+  ["multidisciplinary","using many subjects together, like math and science in one project","Our robot project was ___: we used math, science and art.","her"],
+  ["multiply","to make many more; to add equal groups again and again","If you ___ 3 by 4, you get 12.","extra"],
+  ["multicolored","having many colors","She painted a ___ rainbow on the wall.","extra"]]},
  {r:"poly",o:"Greek",m:"many",w:[
-  ["polytheism","the belief in many gods","The ancient Greeks practiced ___: they worshipped Zeus, Athena and many other gods."],
-  ["polygon","a flat shape with many straight sides","A triangle, a square and a hexagon are each a ___."]]},
+  ["polytheism","the belief in many gods","The ancient Greeks practiced ___: they worshipped Zeus, Athena and many other gods.","her"],
+  ["polygon","a flat shape with many straight sides","A triangle, a square and a hexagon are each a ___.","extra"]]},
  {r:"mega",alt:["megalo"],o:"Greek",m:"big, great",w:[
-  ["megalosaurus","a huge meat-eating dinosaur (its name means “great lizard”)","The ___ was one of the first dinosaurs ever named."],
-  ["megaphone","a cone that makes your voice sound big and loud","The coach yelled through a ___ so everyone could hear."]]}
+  ["megalosaurus","a huge meat-eating dinosaur (its name means “great lizard”)","The ___ was one of the first dinosaurs ever named.","her"],
+  ["megalopolis","a giant city, or a group of big cities that have grown together","Los Angeles and the cities around it form one huge ___.","her"],
+  ["megaphone","a cone that makes your voice sound big and loud","The coach yelled through a ___ so everyone could hear.","extra"]]}
 ],
 extra:[
  {lvl:2,skill:"Spelling root words",q:"Which word is spelled correctly?",choices:["polytheism","politheism","polythiesm","polytheisum"],a:0,why:"*poly* (many) + *the* (god) + *ism* (belief) = *polytheism*. Spell it one part at a time: p-o-l-y + t-h-e + i-s-m."},
@@ -2349,9 +2353,11 @@ function openRoots(){
     const sec=document.createElement("div");sec.className="unit";
     const hd=document.createElement("div");hd.className="uh";hd.innerHTML="<p class='label' style='margin:0'>"+esc(u.name)+"</p>";
     const b=document.createElement("button");b.className="small";b.textContent="Practice";b.onclick=()=>startUnit(u.id);hd.appendChild(b);sec.appendChild(hd);
+    const note=u.note||(u.starter?"Practice roots common in 4th grade, not from her class cards.":"From her class work.");
+    const np=document.createElement("p");np.className="unote";np.textContent=note;sec.appendChild(np);
     u.roots.forEach(x=>{const c=document.createElement("div");c.className="rcard";
       c.innerHTML="<div class='rt'><b>"+esc(x.label)+"</b><span class='m'>"+esc(x.m)+"</span><span class='o'>"+x.o+"</span></div><ul>"+
-        x.w.map(([w,m])=>"<li><i>"+esc(w)+"</i>: "+esc(m)+"</li>").join("")+"</ul>";
+        x.w.map(([w,m,,tag])=>"<li"+(tag==="extra"?" class='extra'":"")+">"+(tag==="her"?"⭐ ":"")+"<i>"+esc(w)+"</i>: "+esc(m)+(tag==="extra"?" (practice word)":"")+"</li>").join("")+"</ul>";
       sec.appendChild(c)});
     box.appendChild(sec)});
   show("roots");
