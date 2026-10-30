@@ -2504,4 +2504,96 @@ function renderReport(){
 }
 renderAll();
 </script>
+<script>
+/* School Prep progress sync (SP_SYNC_V1).
+   Keeps Ivana's progress in one place (a Wix CMS item) so the Android app and the website share it.
+   Pull + merge when the page opens or comes back into view, push whenever local progress changes.
+   Merge: practice rounds and level log are combined; a weekly test keeps its first try; each level
+   track keeps the higher level; per-question counters come from whichever side answered more. */
+(function(){
+var CID="e5b61c17-e04c-4e3d-8155-781db19fc3a0",API="https://www.wixapis.com",COL="progress",ID="sp-main";
+var K={rc:"rc_ivana_v1",mm:"mm_ivana_v1"},TOK="sp_wix_tok";
+function get(k){try{return JSON.parse(localStorage.getItem(k)||"{}")||{}}catch(e){return{}}}
+function put(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(e){}}
+function stable(v){if(Array.isArray(v))return"["+v.map(stable).join(",")+"]";
+  if(v&&typeof v==="object")return"{"+Object.keys(v).sort().map(function(k){return JSON.stringify(k)+":"+stable(v[k])}).join(",")+"}";
+  return JSON.stringify(v===undefined?null:v)}
+function parse(s){if(!s)return{};if(typeof s==="object")return s;try{return JSON.parse(s)||{}}catch(e){return{}}}
+
+// ---------- merge ----------
+function union(a,b,key,cap){var m={},out=[];(a||[]).concat(b||[]).forEach(function(x){var k=key(x);if(!m[k]){m[k]=1;out.push(x)}});
+  out.sort(function(x,y){return (x.at||0)-(y.at||0)});return cap?out.slice(-cap):out}
+function sum(o){var n=0;for(var k in o||{})n+=+o[k]||0;return n}
+function better(a,b){if(!a)return b;if(!b)return a;
+  if((a.top||0)!==(b.top||0))return (a.top||0)>(b.top||0)?a:b;
+  return (a.pass||0)>=(b.pass||0)?a:b}
+function mergeRC(L,R){
+  var o={},k;for(k in R)o[k]=R[k];for(k in L)o[k]=L[k];
+  o.runs=union(L.runs,R.runs,function(r){return r.at+"|"+r.kind+"|"+r.name},300);
+  o.levelLog=union(L.levelLog,R.levelLog,function(l){return l.at+"|"+l.track+"|"+l.lvl});
+  o.weekly={};[L.weekly||{},R.weekly||{}].forEach(function(W){for(var wk in W){var w=o.weekly[wk]=o.weekly[wk]||{};
+    for(var t in W[wk]){var x=W[wk][t];if(!w[t]||(x&&(x.at||0)<(w[t].at||0)))w[t]=x}}});
+  o.lv={};[L.lv||{},R.lv||{}].forEach(function(V){for(var t in V)o.lv[t]=better(o.lv[t],V[t])});
+  o.learned={};[R.learned||{},L.learned||{}].forEach(function(X){for(var i in X)if(X[i])o.learned[i]=X[i]});
+  var big=sum(R.seen)>sum(L.seen)?R:L;["skill","miss","seen","root"].forEach(function(f){o[f]=big[f]||{}});
+  return o}
+function mergeMM(L,R){var o={},k;for(k in R)o[k]=R[k];for(k in L)o[k]=L[k];
+  o.runs=union(L.runs,R.runs,function(r){return r.at+"|"+r.kind+"|"+r.score},200);return o}
+
+// ---------- Wix (anonymous visitor token, public client id) ----------
+function saveTok(d){var t={a:d.access_token,r:d.refresh_token,e:Date.now()+(d.expires_in||3600)*1000};try{localStorage.setItem(TOK,JSON.stringify(t))}catch(e){}return t.a}
+function mint(body){body.clientId=CID;return fetch(API+"/oauth2/token",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+  .then(function(r){if(!r.ok)throw new Error("auth "+r.status);return r.json()}).then(saveTok)}
+function token(fresh){var t=null;try{t=JSON.parse(localStorage.getItem(TOK)||"null")}catch(e){}
+  if(!fresh&&t&&t.a&&t.e-60000>Date.now())return Promise.resolve(t.a);
+  if(!fresh&&t&&t.r)return mint({grantType:"refresh_token",refreshToken:t.r}).catch(function(){return mint({grantType:"anonymous"})});
+  return mint({grantType:"anonymous"})}
+function call(method,path,body,retry){return token(retry).then(function(tk){
+  return fetch(API+path,{method:method,headers:{"Authorization":tk,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined})})
+  .then(function(r){if((r.status===401||r.status===403)&&!retry)return call(method,path,body,true);return r})}
+function pull(){return call("GET","/wix-data/v2/items/"+ID+"?dataCollectionId="+COL).then(function(r){
+  if(r.status===404)return null;if(!r.ok)throw new Error("get "+r.status);
+  return r.json().then(function(j){var d=(j.dataItem&&j.dataItem.data)||{};return{rc:parse(d.rc),mm:parse(d.mm)}})})}
+function push(rc,mm,exists){var data={_id:ID,rc:JSON.stringify(rc),mm:JSON.stringify(mm),updated:Date.now()};
+  var p=exists?call("PUT","/wix-data/v2/items/"+ID,{dataCollectionId:COL,dataItem:{id:ID,data:data}})
+              :call("POST","/wix-data/v2/items",{dataCollectionId:COL,dataItem:{id:ID,data:data}});
+  return p.then(function(r){if(!r.ok)throw new Error("save "+r.status)})}
+
+// ---------- adopt merged state into the open page (only on the home screen, never mid-quiz) ----------
+function adopt(rc){try{
+  if(typeof st==="undefined"||typeof renderAll!=="function")return;
+  if(typeof S!=="undefined"&&S)return;
+  var h=document.getElementById("home");if(!h||h.hidden)return;
+  var lv=st.lv||{};for(var k in rc)if(rc[k]!=null)st[k]=rc[k];
+  for(var t in lv)if(!st.lv[t])st.lv[t]=lv[t];
+  renderAll();
+}catch(e){}}
+
+var busy=null,last=null;
+function snap(){return stable(get(K.rc))+"\n"+stable(get(K.mm))}
+function sync(live){
+  if(busy)return busy;
+  busy=pull().then(function(remote){
+    var lrc=get(K.rc),lmm=get(K.mm),rc=lrc,mm=lmm;
+    if(remote){rc=mergeRC(lrc,remote.rc);mm=mergeMM(lmm,remote.mm)}
+    if(stable(rc)!==stable(lrc)){put(K.rc,rc);if(live)adopt(rc)}
+    if(stable(mm)!==stable(lmm))put(K.mm,mm);
+    var mine=stable(rc)+"\n"+stable(mm);
+    last=mine;
+    if(remote&&stable(remote.rc)+"\n"+stable(remote.mm)===mine)return "same";
+    return push(rc,mm,!!remote).catch(function(e){if(!remote)return push(rc,mm,true);throw e}).then(function(){return "saved"});
+  }).then(function(s){SP.status="ok "+s+" "+new Date().toLocaleTimeString();busy=null;return s},
+          function(e){SP.status="error "+(e&&e.message);busy=null;last=null;return "error"});
+  return busy}
+function start(){
+  if(SP.started)return;SP.started=1;
+  sync(true);
+  setInterval(function(){if(snap()!==last)sync(true)},8000);
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")sync(true);else if(snap()!==last)sync(false)});
+}
+var SP=window.SPSync=window.SPSync&&window.SPSync.v===1?window.SPSync:{v:1};
+SP.sync=sync;SP.start=start;SP.mergeRC=mergeRC;SP.mergeMM=mergeMM;
+if(!window.SP_NO_AUTOSTART)start();
+})();
+</script>
 </body></html>
