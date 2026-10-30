@@ -1433,6 +1433,37 @@ SUBJ.math=(()=>{
     {id:"mul",name:"2-digit × 2-digit",notes:["Use any method: area model or two rows (ones row, then tens row).","In the tens row, put a 0 first because you are multiplying by tens.","Check with an estimate: 58 × 86 ≈ 60 × 90 = 5,400, so 4,988 makes sense.","Word problems: rows of, boxes of, each, in all → multiply."],qs:solve}]};
 })();
 
+// Math: the method names, hundreds and dollar amounts from her Unit 2 class pages. Fixed questions (no seed), each with its own key.
+SUBJ.math.topics.push({id:"methods",name:"Methods, hundreds & dollars",notes:[
+ "*Distributive Property*: 6 × (40 + 7) = (6 × 40) + (6 × 7). Multiply each part, then add.",
+ "*Place Value Sections*: draw a rectangle split into tens and ones (70 | 3), write the product in each section, then add.",
+ "*Expanded Notation*: write the number as 70 + 3 in a column, multiply each part, then add.",
+ "*Algebraic Notation*: write it in one line: 5 × 73 = 5 × (70 + 3) = 350 + 15 = 365.",
+ "All three methods do the same thing: multiply each place value part, then add the partial products.",
+ "*Shortcut*: multiply the ones first, write the ones digit and carry the tens (new groups). Then multiply the tens and add what you carried.",
+ "*Hundreds*: 7 × 3 = 21, so 7 × 300 = 21 hundreds = 2,100. For 4 × 236, split into 200 + 30 + 6.",
+ "*Dollars*: multiply like any number, then write the $ sign. Estimate first: 32 × $7 is about 30 × $7 = $210."],qs:[
+ Object.assign(sq(1,"6 × (40 + 7) = (6 × 40) + (6 × 7). Which property is this?",["Distributive Property","Commutative Property","Associative Property","Identity Property"],0,"Spreading the 6 over each part of 40 + 7 is the *Distributive Property*."),{key:"dist"}),
+ Object.assign(sq(1,"What is 7 × 300?",["2,100","210","21,000","307"],0,"7 × 3 = 21, so 7 × 3 hundreds = 21 hundreds = 2,100."),{key:"h7x300"}),
+ Object.assign(sq(1,"6 × 3 = 18. What is 6 × 3 hundreds?",["18 hundreds, or 1,800","18 tens, or 180","18 thousands, or 18,000","9 hundreds, or 900"],0,"The pattern stays the same, just in hundreds: 18 hundreds = 1,800."),{key:"hpat"}),
+ Object.assign(sq(1,"A book costs $14. How much do 6 books cost?",["$84","$64","$80","$20"],0,"6 × $10 = $60 and 6 × $4 = $24. $60 + $24 = $84."),{key:"d14x6"}),
+ Object.assign(sq(2,"Which is the Algebraic Notation way to find 4 × 36?",["4 × (30 + 6) = 120 + 24 = 144","4 × 36 = 4 + 36 = 40","4 × (3 + 6) = 12 + 24 = 36","4 × (30 × 6) = 720"],0,"Split 36 into 30 + 6, multiply each by 4, then add: 120 + 24 = 144."),{key:"alg4x36"}),
+ Object.assign(sq(2,"To find 5 × 73 with Place Value Sections, how do you split the rectangle?",["into 70 and 3","into 7 and 3","into 5 and 73","into 50 and 3"],0,"73 is 7 tens and 3 ones, so the sections are 70 and 3. Then 5 × 70 = 350 and 5 × 3 = 15."),{key:"pvs5x73"}),
+ Object.assign(sq(2,"Expanded Notation for 8 × 26: 26 = 20 + 6. What are the two partial products?",["160 and 48","16 and 48","160 and 6","28 and 14"],0,"8 × 20 = 160 and 8 × 6 = 48. Add them: 208."),{key:"exp8x26"}),
+ Object.assign(sq(2,"A rectangle model for 4 × 236 has sections 200, 30 and 6. What are the three parts?",["800 + 120 + 24","8 + 12 + 24","800 + 12 + 24","80 + 120 + 24"],0,"4 × 200 = 800, 4 × 30 = 120, 4 × 6 = 24. Count the zeros in each part."),{key:"h4x236p"}),
+ Object.assign(sq(2,"What is 4 × 236?",["944","844","924","9,440"],0,"800 + 120 + 24 = 944."),{key:"h4x236"}),
+ Object.assign(sq(2,"Tickets cost $8 each. How much do 23 tickets cost?",["$184","$164","$31","$1,624"],0,"8 × 20 = 160 and 8 × 3 = 24. $160 + $24 = $184."),{key:"d8x23"}),
+ Object.assign(sq(2,"Estimate: 32 lunches cost $7 each. About how much is that?",["about $210","about $21","about $2,100","about $39"],0,"Round 32 to 30. 30 × $7 = $210."),{key:"dest"}),
+ Object.assign(sq(2,"5 × 38 with the shortcut: 5 × 8 = 40, so you write 0 and carry 4 tens. Then 5 × 3 tens = 15 tens, plus the 4 you carried. What is the answer?",["190","154","150","1,540"],0,"15 tens + 4 tens = 19 tens. Write 19 next to the 0: 190."),{key:"short5x38"}),
+ Object.assign(sq(3,"Partial products for 7 × 84 are 560 and 28. What is 7 × 84?",["588","568","5,628","488"],0,"Add the partial products: 560 + 28 = 588."),{key:"pp7x84"}),
+ Object.assign(sq(3,"What is 5 × 418?",["2,090","2,050","20,090","2,009"],0,"5 × 400 = 2,000, 5 × 10 = 50, 5 × 8 = 40. 2,000 + 50 + 40 = 2,090."),{key:"h5x418"}),
+ Object.assign(sq(3,"A class buys 27 T-shirts at $9 each. What is the total cost?",["$243","$223","$36","$1,863"],0,"9 × 20 = 180 and 9 × 7 = 63. $180 + $63 = $243."),{key:"d9x27"}),
+ Object.assign(sq(3,"Ivana has $100. She buys 4 games that cost $18 each. How much money does she have left?",["$28","$72","$82","$38"],0,"Two steps. First 4 × $18 = $72. Then $100 − $72 = $28."),{key:"d2step"}),
+ Object.assign(sq(3,"How are Place Value Sections, Expanded Notation and Algebraic Notation the same?",["They all multiply each place value part, then add the partial products.","They all add the two numbers first.","They all round the numbers to the nearest ten.","They all give different answers."],0,"Each method breaks the big number into place value parts, multiplies each part, then adds."),{key:"same"}),
+ Object.assign(sq(3,"Which is NOT a correct way to find 3 × 52?",["(3 × 5) + (3 × 2)","(3 × 50) + (3 × 2)","150 + 6","3 × (50 + 2)"],0,"The 5 in 52 means 50, not 5. So (3 × 5) + (3 × 2) is wrong. The answer is 156."),{key:"not3x52"}),
+ Object.assign(sq(3,"Pens cost $3 a pack. Which is NOT a correct way to find the cost of 24 packs?",["$3 + $24","3 × 24","(3 × 20) + (3 × 4)","$60 + $12"],0,"Adding $3 + $24 doesn't multiply. The cost is 3 × 24 = $72."),{key:"not3x24"})
+]});
+SUBJ.math.intro="Unit 2: multiplying big numbers. Estimate, area model, methods, dollars, then solve.";
 SUBJ.ss={name:"Social Studies",icon:"🏕️",intro:"Unit 2: California's Native Peoples (TCI Lesson 2).",
  levels:[
   {name:"Words",desc:"Key words and who did what.",need:.8,mix:{1:1},n:10,test:false},
